@@ -4,7 +4,7 @@
  * @version 2.0 - Senior Developer Best Practices
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\TelegramBot;
 
