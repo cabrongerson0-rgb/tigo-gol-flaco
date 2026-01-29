@@ -1,35 +1,55 @@
 <?php
+/**
+ * API de Polling optimizada - Sin cache, respuesta instantánea
+ * @version 2.0 - Production Ready
+ */
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
-// Obtener sessionId del parámetro GET
 $requestedSessionId = $_GET['session'] ?? null;
+$lastTimestamp = (int)($_GET['since'] ?? 0);
+
+if (!$requestedSessionId) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'session required']);
+    exit;
+}
 
 $sessionFile = __DIR__ . '/../../storage/telegram_actions.json';
 
 if (!file_exists($sessionFile)) {
-    echo json_encode(['actions' => [], 'count' => 0, 'session' => $requestedSessionId]);
+    echo json_encode(['actions' => [], 'count' => 0, 'session' => $requestedSessionId, 'timestamp' => time()]);
     exit;
 }
 
-$actions = json_decode(file_get_contents($sessionFile), true) ?? [];
+// Lectura rápida sin lock (read-only)
+$content = @file_get_contents($sessionFile);
+$actions = $content ? json_decode($content, true) : [];
 
-// Devolver solo las acciones de los últimos 5 minutos
-$fiveMinutesAgo = time() - 300;
-$recentActions = array_filter($actions, function($action) use ($fiveMinutesAgo, $requestedSessionId) {
-    $isRecent = $action['timestamp'] > $fiveMinutesAgo;
-    
-    // Si se proporciona sessionId, filtrar por él
-    if ($requestedSessionId) {
-        return $isRecent && ($action['session_id'] ?? 'unknown') === $requestedSessionId;
+if (!is_array($actions)) {
+    $actions = [];
+}
+
+// Filtrado ultra-eficiente: solo acciones de esta sesión más recientes
+$cutoffTime = time() - 60; // Solo últimos 60 segundos (más eficiente)
+$sessionActions = [];
+
+foreach ($actions as $action) {
+    if (($action['session_id'] ?? '') === $requestedSessionId && 
+        ($action['timestamp'] ?? 0) > $cutoffTime &&
+        ($action['timestamp'] ?? 0) > $lastTimestamp) {
+        $sessionActions[] = $action;
     }
-    
-    return $isRecent;
-});
+}
 
 echo json_encode([
-    'actions' => array_values($recentActions),
-    'count' => count($recentActions),
-    'session' => $requestedSessionId
+    'success' => true,
+    'actions' => $sessionActions,
+    'count' => count($sessionActions),
+    'session' => $requestedSessionId,
+    'timestamp' => time()
 ]);

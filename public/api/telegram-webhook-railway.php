@@ -1,28 +1,27 @@
 <?php
 /**
- * Webhook handler para Railway - Recibe callbacks directamente de Telegram
- * Sin dependencia de archivos
+ * Webhook handler para Railway - Optimizado para respuesta instantánea
+ * @version 2.0 - Senior Developer Best Practices
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\TelegramBot;
 
+// Headers optimizados
 header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
 
 // Obtener input de Telegram
 $input = file_get_contents('php://input');
 $update = json_decode($input, true);
 
-// Log para debugging
-error_log('Webhook received: ' . $input);
-
 if (!$update) {
+    http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Invalid JSON']);
     exit;
 }
-
-$telegram = new TelegramBot();
 
 // Procesar callback_query (botones presionados)
 if (isset($update['callback_query'])) {
@@ -35,18 +34,26 @@ if (isset($update['callback_query'])) {
     $action = $parts[0] ?? $callbackData;
     $sessionId = $parts[1] ?? 'unknown';
     
-    error_log("Button pressed: $action (session: $sessionId)");
+    // Responder PRIMERO a Telegram (fastest response)
+    $telegram = new TelegramBot();
+    $telegram->answerCallbackQuery($callbackQueryId, '✅');
     
-    // Guardar en archivo (con fallback)
+    // Guardar acción con file locking para evitar race conditions
     $sessionFile = __DIR__ . '/../../storage/telegram_actions.json';
     
-    try {
-        $actions = [];
-        if (file_exists($sessionFile)) {
-            $content = file_get_contents($sessionFile);
-            $actions = json_decode($content, true) ?? [];
-        }
+    $fp = fopen($sessionFile, 'c+');
+    if (flock($fp, LOCK_EX)) {
+        fseek($fp, 0);
+        $content = stream_get_contents($fp);
+        $actions = $content ? json_decode($content, true) : [];
         
+        // Cleanup automático: eliminar acciones de hace más de 10 minutos
+        $cutoffTime = time() - 600;
+        $actions = array_filter($actions ?? [], function($a) use ($cutoffTime) {
+            return ($a['timestamp'] ?? 0) > $cutoffTime;
+        });
+        
+        // Agregar nueva acción
         $actions[] = [
             'action' => $action,
             'session_id' => $sessionId,
@@ -54,21 +61,21 @@ if (isset($update['callback_query'])) {
             'callback_query_id' => $callbackQueryId
         ];
         
-        // Mantener solo últimas 100
-        if (count($actions) > 100) {
-            $actions = array_slice($actions, -100);
+        // Mantener solo últimas 50 (optimizado)
+        if (count($actions) > 50) {
+            $actions = array_slice($actions, -50);
         }
         
-        file_put_contents($sessionFile, json_encode($actions, JSON_PRETTY_PRINT));
-        
-    } catch (Exception $e) {
-        error_log("Error saving action: " . $e->getMessage());
+        // Escribir sin pretty print (más rápido)
+        ftruncate($fp, 0);
+        fseek($fp, 0);
+        fwrite($fp, json_encode($actions));
+        fflush($fp);
+        flock($fp, LOCK_UN);
     }
+    fclose($fp);
     
-    // Responder al callback
-    $telegram->answerCallbackQuery($callbackQueryId, '✅ Comando ejecutado');
-    
-    echo json_encode(['ok' => true, 'action' => $action]);
+    echo json_encode(['ok' => true, 'action' => $action, 'session' => $sessionId]);
     exit;
 }
 
