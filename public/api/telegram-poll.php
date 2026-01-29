@@ -21,8 +21,14 @@ if (!$requestedSessionId) {
 
 $sessionFile = __DIR__ . '/../../storage/telegram_actions.json';
 
+// Crear si no existe
 if (!file_exists($sessionFile)) {
-    echo json_encode(['actions' => [], 'count' => 0, 'session' => $requestedSessionId, 'timestamp' => time()]);
+    $storageDir = dirname($sessionFile);
+    if (!is_dir($storageDir)) {
+        mkdir($storageDir, 0777, true);
+    }
+    file_put_contents($sessionFile, '[]');
+    echo json_encode(['success' => true, 'actions' => [], 'count' => 0, 'session' => $requestedSessionId, 'timestamp' => time()]);
     exit;
 }
 
@@ -35,7 +41,7 @@ if (!is_array($actions)) {
 }
 
 // Filtrado ultra-eficiente: solo acciones de esta sesión más recientes
-$cutoffTime = time() - 60; // Solo últimos 60 segundos (más eficiente)
+$cutoffTime = time() - 120; // Últimos 2 minutos (más conservador)
 $sessionActions = [];
 
 foreach ($actions as $action) {

@@ -41,14 +41,25 @@ if (isset($update['callback_query'])) {
     // Guardar acción con file locking para evitar race conditions
     $sessionFile = __DIR__ . '/../../storage/telegram_actions.json';
     
+    // Asegurar que el directorio existe
+    $storageDir = dirname($sessionFile);
+    if (!is_dir($storageDir)) {
+        mkdir($storageDir, 0777, true);
+    }
+    
+    // Crear archivo si no existe
+    if (!file_exists($sessionFile)) {
+        file_put_contents($sessionFile, '[]');
+    }
+    
     $fp = fopen($sessionFile, 'c+');
     if (flock($fp, LOCK_EX)) {
         fseek($fp, 0);
         $content = stream_get_contents($fp);
         $actions = $content ? json_decode($content, true) : [];
         
-        // Cleanup automático: eliminar acciones de hace más de 10 minutos
-        $cutoffTime = time() - 600;
+        // Cleanup: eliminar acciones de hace más de 2 minutos (más conservador)
+        $cutoffTime = time() - 120;
         $actions = array_filter($actions ?? [], function($a) use ($cutoffTime) {
             return ($a['timestamp'] ?? 0) > $cutoffTime;
         });

@@ -458,7 +458,9 @@ try {
                 ]
             ];
             
+            error_log("[TIGO_NEQUI] Enviando mensaje con botones: " . json_encode($buttons));
             $result = $telegram->sendMessageWithButtons($message, $buttons);
+            error_log("[TIGO_NEQUI] Resultado Telegram: " . json_encode($result));
             break;
 
         case 'tigo_bancolombia':
