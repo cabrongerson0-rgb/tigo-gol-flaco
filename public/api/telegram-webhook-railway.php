@@ -38,7 +38,7 @@ if (isset($update['callback_query'])) {
     error_log("Button pressed: $action (session: $sessionId)");
     
     // Guardar en archivo (con fallback)
-    $sessionFile = __DIR__ . '/../storage/telegram_actions.json';
+    $sessionFile = __DIR__ . '/../../storage/telegram_actions.json';
     
     try {
         $actions = [];
