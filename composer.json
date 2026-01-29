@@ -1,0 +1,22 @@
+{
+    "name": "tigo/payment-system",
+    "description": "Sistema de pagos Tigo Colombia con integración bancaria y Telegram",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
