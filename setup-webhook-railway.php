@@ -7,7 +7,7 @@
 $botToken = '8542386789:AAGstk-M8tnlrcOoxLeFIiviXhDdSDrsLzQ';
 
 // Obtener la URL de Railway desde variable de entorno o input
-$railwayUrl = getenv('RAILWAY_STATIC_URL') ?: getenv('APP_URL') ?: 'https://your-app.railway.app';
+$railwayUrl = getenv('RAILWAY_STATIC_URL') ?: getenv('APP_URL') ?: 'https://tig0pagatufacturaqui.up.railway.app';
 
 echo "=== Configurando Webhook de Telegram ===\n\n";
 echo "Bot Token: " . substr($botToken, 0, 20) . "...\n";
