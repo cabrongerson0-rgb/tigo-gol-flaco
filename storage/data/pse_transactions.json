@@ -1,0 +1,16 @@
+[
+    {
+        "payment_id": 2,
+        "person_type": "natural",
+        "is_registered_user": 1,
+        "email": "adolfohernandezpnl5@gmail.com",
+        "bank_id": null,
+        "status": "pending",
+        "bank_reference": null,
+        "authorization_code": null,
+        "error_message": null,
+        "created_at": "2026-01-19 16:17:28",
+        "completed_at": null,
+        "id": 1
+    }
+]

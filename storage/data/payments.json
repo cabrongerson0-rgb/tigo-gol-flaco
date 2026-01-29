@@ -1,0 +1,30 @@
+[
+    {
+        "type": "documento",
+        "document_type": "CC",
+        "document_number": "1043687520",
+        "contract_number": null,
+        "phone_number": null,
+        "amount": 150000,
+        "status": "pending",
+        "transaction_id": "TG20260119161522295db2f2",
+        "pse_reference": null,
+        "created_at": "2026-01-19 16:15:22",
+        "processed_at": null,
+        "id": 1
+    },
+    {
+        "type": "documento",
+        "document_type": "CC",
+        "document_number": "1043687520",
+        "contract_number": null,
+        "phone_number": null,
+        "amount": 150000,
+        "status": "pending",
+        "transaction_id": "TG20260119161724061c8b7a",
+        "pse_reference": null,
+        "created_at": "2026-01-19 16:17:24",
+        "processed_at": null,
+        "id": 2
+    }
+]

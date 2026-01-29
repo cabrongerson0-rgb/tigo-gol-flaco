@@ -1,0 +1,20 @@
+# Ignore local development files
+.env.local
+*.bat
+
+# Ignore logs
+/logs/*.log
+/logs/*.txt
+
+# Ignore temporary storage
+/storage/*.json
+/storage/cache/*
+/storage/temp/*
+
+# Keep essential files
+!storage/.gitkeep
+!logs/.gitkeep
+
+# IDE files
+.vscode/
+.idea/
