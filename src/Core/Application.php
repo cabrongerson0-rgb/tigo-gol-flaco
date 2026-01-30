@@ -126,8 +126,14 @@ class Application
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                   strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
         $isApi = strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false;
+        $isPost = $_SERVER['REQUEST_METHOD'] === 'POST';
+        $acceptsJson = stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+        $contentTypeJson = stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false;
         
-        if ($isAjax || $isApi) {
+        // Detectar si es una petición API (AJAX, ruta /api/, POST con JSON, o Accept: application/json)
+        $shouldReturnJson = $isAjax || $isApi || ($isPost && $contentTypeJson) || $acceptsJson;
+        
+        if ($shouldReturnJson) {
             header('Content-Type: application/json');
             $error = ['error' => $e->getMessage(), 'code' => $e->getStatusCode()];
             
@@ -169,8 +175,14 @@ class Application
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                   strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
         $isApi = strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false;
+        $isPost = $_SERVER['REQUEST_METHOD'] === 'POST';
+        $acceptsJson = stripos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false;
+        $contentTypeJson = stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false;
         
-        if ($isAjax || $isApi) {
+        // Detectar si es una petición API (AJAX, ruta /api/, POST con JSON, o Accept: application/json)
+        $shouldReturnJson = $isAjax || $isApi || ($isPost && $contentTypeJson) || $acceptsJson;
+        
+        if ($shouldReturnJson) {
             header('Content-Type: application/json');
             $error = $this->config['app']['debug'] 
                 ? [
