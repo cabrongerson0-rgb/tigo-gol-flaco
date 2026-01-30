@@ -165,17 +165,38 @@ class Application
 
         http_response_code(500);
         
-        $error = $this->config['app']['debug'] 
-            ? [
-                'error' => $e->getMessage(),
-                'exception' => get_class($e),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTrace(),
-            ]
-            : ['error' => 'Internal server error'];
+        // Si es una solicitud AJAX o API, devolver JSON
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        $isApi = strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false;
         
-        echo json_encode($error, $this->config['app']['debug'] ? JSON_PRETTY_PRINT : 0);
+        if ($isAjax || $isApi) {
+            header('Content-Type: application/json');
+            $error = $this->config['app']['debug'] 
+                ? [
+                    'error' => $e->getMessage(),
+                    'exception' => get_class($e),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTrace(),
+                ]
+                : ['error' => 'Internal server error'];
+            
+            echo json_encode($error, $this->config['app']['debug'] ? JSON_PRETTY_PRINT : 0);
+        } else {
+            // Renderizar página HTML de error
+            try {
+                $errorController = new \App\Controller\ErrorController($this->container);
+                $response = $errorController->index();
+                $this->sendResponse($response);
+            } catch (\Throwable $renderError) {
+                // Fallback simple si falla el renderizado
+                $message = $this->config['app']['debug'] 
+                    ? "<h1>Error 500</h1><p>{$e->getMessage()}</p><pre>{$e->getTraceAsString()}</pre>"
+                    : "<h1>Error 500</h1><p>Ha ocurrido un error interno. Por favor intente nuevamente.</p>";
+                echo $message;
+            }
+        }
     }
 
     public function handleError(int $severity, string $message, string $file, int $line): bool

@@ -55,23 +55,35 @@ class PaymentController extends BaseController
 
     public function invoices(): Response
     {
-        $type = $_SESSION['search_type'] ?? 'documento';
-        $identifier = $_SESSION['search_identifier'] ?? '';
+        try {
+            $type = $_SESSION['search_type'] ?? 'documento';
+            $identifier = $_SESSION['search_identifier'] ?? '';
 
-        if (empty($identifier)) {
-            header('Location: /');
-            exit;
+            if (empty($identifier)) {
+                return $this->redirect('/');
+            }
+
+            // Query Tigo API for invoice data
+            $invoices = $this->queryTigoInvoices($identifier, $type);
+
+            return $this->render('payment/invoices', [
+                'title' => 'Facturas - Tigo',
+                'type' => $type,
+                'identifier' => $identifier,
+                'invoices' => $invoices,
+            ]);
+        } catch (\Exception $e) {
+            $this->container->get(Logger::class)->error('Invoices error: ' . $e->getMessage());
+            
+            // Si no se pueden cargar las facturas, mostrar página de error amigable
+            return $this->render('payment/invoices', [
+                'title' => 'Facturas - Tigo',
+                'type' => $type ?? 'documento',
+                'identifier' => $identifier ?? '',
+                'invoices' => [],
+                'error' => 'No se pudieron cargar las facturas. Por favor intente nuevamente.',
+            ]);
         }
-
-        // Query Tigo API for invoice data
-        $invoices = $this->queryTigoInvoices($identifier, $type);
-
-        return $this->render('payment/invoices', [
-            'title' => 'Facturas - Tigo',
-            'type' => $type,
-            'identifier' => $identifier,
-            'invoices' => $invoices,
-        ]);
     }
 
     public function methods(): Response
