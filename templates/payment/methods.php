@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 } else if (method === 'nequi') {
                                     window.location.href = '/bancas/Nequi/numero.html';
                                 } else if (method === 'pse') {
-                                    window.location.href = `/pse/form?invoice_id=${invoiceId}`;
+                                    window.location.href = `/pse/form.html?invoice_id=${invoiceId}`;
                                 }
                             }, 100);
                         }
