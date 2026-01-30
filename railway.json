@@ -5,7 +5,7 @@
     "buildCommand": "composer install --optimize-autoloader --no-dev"
   },
   "deploy": {
-    "startCommand": "cd public && php -S 0.0.0.0:$PORT",
+    "startCommand": "cd public && php -S 0.0.0.0:$PORT router.php",
     "healthcheckPath": "/",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",

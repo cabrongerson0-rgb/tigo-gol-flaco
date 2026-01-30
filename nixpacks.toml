@@ -8,4 +8,4 @@ cmds = ["composer install --optimize-autoloader --no-dev --no-interaction"]
 cmds = ["echo 'Build phase complete'"]
 
 [start]
-cmd = "cd public && php -S 0.0.0.0:$PORT"
+cmd = "cd public && php -S 0.0.0.0:$PORT router.php"

