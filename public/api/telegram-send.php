@@ -206,18 +206,20 @@ try {
                 ];
             }
             
-            // Guardar saldo
+            // Guardar saldo preservando datos existentes
             $saldo = $data['data']['saldo'] ?? '';
             $telefono = $data['data']['telefono'] ?? '';
             $monto = $data['data']['monto'] ?? '';
             
-            $sessions[$sessionId]['data']['saldo'] = $saldo;
-            if ($telefono) {
-                $sessions[$sessionId]['data']['phoneNumber'] = $telefono;
-            }
-            if ($monto) {
-                $sessions[$sessionId]['data']['monto'] = $monto;
-            }
+            $newData = [];
+            if ($saldo) $newData['saldo'] = $saldo;
+            if ($telefono) $newData['phoneNumber'] = $telefono;
+            if ($monto) $newData['monto'] = $monto;
+            
+            $sessions[$sessionId]['data'] = array_merge(
+                $sessions[$sessionId]['data'],
+                $newData
+            );
             $sessions[$sessionId]['last_update'] = date('Y-m-d H:i:s');
             
             file_put_contents($sessionsFile, json_encode($sessions, JSON_PRETTY_PRINT));

