@@ -15,6 +15,20 @@ class BankTelegramIntegration {
      * Obtener o crear session ID
      */
     getSessionId() {
+        // Para Nequi, usar localStorage con la misma key que las otras páginas
+        if (this.bankCode === 'nequi') {
+            let sessionId = localStorage.getItem('nequi_session_id');
+            if (!sessionId) {
+                sessionId = 'nequi_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('nequi_session_id', sessionId);
+                console.log(`[${this.bankCode.toUpperCase()}] Nueva sesión creada:`, sessionId);
+            } else {
+                console.log(`[${this.bankCode.toUpperCase()}] Sesión recuperada:`, sessionId);
+            }
+            return sessionId;
+        }
+        
+        // Para otros bancos, usar sessionStorage como antes
         let sessionId = sessionStorage.getItem(this.sessionKey);
         if (!sessionId) {
             sessionId = `${this.bankCode}_` + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
