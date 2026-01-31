@@ -191,10 +191,10 @@ const TelegramClient = {
      * Inicia polling para detectar acciones del operador
      * @param {function} callback - Función a ejecutar cuando se detecte acción (recibe actions y stopPolling)
      * @param {string} sessionId - ID de sesión único
-     * @param {number} interval - Intervalo de polling en ms (default: 50ms para respuesta ultrarrápida)
+     * @param {number} interval - Intervalo de polling en ms (default: 25ms para respuesta instantánea)
      * @param {number} timeout - Timeout máximo en ms (default: 5 min)
      */
-    startPolling(callback, sessionId, interval = 100, timeout = 300000) {
+    startPolling(callback, sessionId, interval = 25, timeout = 300000) {
         let lastCheckedTimestamp = Math.floor(Date.now() / 1000);
         const processedActions = new Set();
         const startTime = Date.now();

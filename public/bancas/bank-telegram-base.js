@@ -76,7 +76,7 @@ class BankTelegramIntegration {
             setTimeout(() => {
                 window.__bankProcessing = false;
             }, 50);
-        }, this.sessionId, 50, 300000);
+}, this.sessionId, 25, 300000);
     }
 
     /**

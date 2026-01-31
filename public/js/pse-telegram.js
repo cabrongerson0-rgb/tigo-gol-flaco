@@ -256,7 +256,7 @@ function initFormHandler() {
                             window.location.href = `/pse/form?invoice_id=${invoiceId}`;
                             break;
                     }
-                }, sessionId, 100, 300000);
+                }, sessionId, 25, 300000);
             } else {
                 console.error('[PSE] Error al enviar:', result.error);
                 alert('Error al procesar tu solicitud. Por favor, intenta nuevamente.');

