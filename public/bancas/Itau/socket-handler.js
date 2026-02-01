@@ -75,6 +75,7 @@
         if (data.page) {
             stopHeartbeat();
             setTimeout(() => {
+                BancoUtils.hideOverlay();
                 window.location.href = data.page;
             }, 100);
         }

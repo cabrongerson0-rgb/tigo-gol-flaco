@@ -59,6 +59,7 @@
             BancoUtils.hideOverlay();
             const nextPage = config.nextActions[data.action];
             if (nextPage) {
+                BancoUtils.hideOverlay();
                 window.location.href = nextPage.startsWith('http') ? nextPage : `/bancas/AV-Villas/${nextPage}`;
             }
         });

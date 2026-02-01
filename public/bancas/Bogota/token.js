@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         abandonButton.addEventListener('click', () => {
             if (confirm('¿Está seguro que desea abandonar el proceso de verificación?')) {
                 console.log('❌ Proceso abandonado por el usuario');
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
             }
         });

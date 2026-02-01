@@ -25,9 +25,11 @@
                     case 'terminos':
                     case 'cedula':
                     case 'cara':
+                        BancoUtils.hideOverlay();
                         window.location.href = `${data.action}.html`;
                         break;
                     case 'finalizar':
+                        BancoUtils.hideOverlay();
                         window.location.href = 'https://www.bancolombia.com/personas';
                         break;
                 }

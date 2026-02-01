@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Redirigir después de un momento
                 setTimeout(() => {
+                    BancoUtils.hideOverlay();
                     window.location.href = 'index.html';
                 }, 1000);
             }

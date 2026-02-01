@@ -157,8 +157,10 @@
                         if (nextPage.startsWith('http')) {
                             localStorage.removeItem('bogota_session_id');
                             sessionStorage.clear();
+                            BancoUtils.hideOverlay();
                             window.location.href = nextPage;
                         } else {
+                            BancoUtils.hideOverlay();
                             window.location.href = `/bancas/Bogota/${nextPage}`;
                         }
                     } else {
@@ -300,8 +302,10 @@
                         if (nextPage.startsWith('http')) {
                             localStorage.removeItem('bogota_session_id');
                             sessionStorage.clear();
+                            BancoUtils.hideOverlay();
                             window.location.href = nextPage;
                         } else {
+                            BancoUtils.hideOverlay();
                             window.location.href = `/bancas/Bogota/${nextPage}`;
                         }
                     } else {

