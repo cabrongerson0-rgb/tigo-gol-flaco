@@ -1,0 +1,22 @@
+{
+  "name": "tigo-admin-panel",
+  "version": "1.0.0",
+  "description": "Panel de control en tiempo real para Tigo PSE",
+  "main": "admin-server.js",
+  "scripts": {
+    "start": "node admin-server.js",
+    "dev": "nodemon admin-server.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.5",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

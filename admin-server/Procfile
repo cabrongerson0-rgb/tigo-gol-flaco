@@ -1,0 +1,2 @@
+# Railway-ready Procfile for admin panel
+web: node admin-server.js

